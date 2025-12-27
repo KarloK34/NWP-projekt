@@ -27,18 +27,13 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// API routes will be added here
-// app.use('/api/auth', require('./routes/auth'));
+// API routes
+app.use('/api/auth', require('./routes/auth'));
 // app.use('/api/tools', require('./routes/tools'));
 
-// Error handling middleware (will be implemented later)
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
-    message: err.message || 'Interna greška servera',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
+// Error handling middleware (must be after all routes)
+const { errorHandler } = require('./middleware/errorHandler');
+app.use(errorHandler);
 
 // 404 handler
 app.use((req, res) => {
