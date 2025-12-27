@@ -35,14 +35,14 @@ app.get('/api/health', (req, res) => {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
-    message: err.message || 'Internal Server Error',
+    message: err.message || 'Interna greška servera',
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 });
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+  res.status(404).json({ message: 'Ruta nije pronađena' });
 });
 
 const PORT = process.env.PORT || 5000;
