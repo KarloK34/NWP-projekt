@@ -373,6 +373,24 @@ class GitHubCatalogService {
    * @param {string} subcategoryName - Ime podkategorije (opcionalno)
    * @returns {Object|null} - Objekt alata ili null ako nije validan
    */
+    extractFirstHttpUrl(text) {
+    if (!text) return '';
+    const m = text.match(/https?:\/\/[^\s)<>\]]+/i);
+    if (!m) return '';
+    // trim trailing punctuation
+    let url = m[0];
+    while (/[)\].,;:!]+$/.test(url)) url = url.slice(0, -1);
+    return url;
+  }
+
+  extractMarkdownUrl(text) {
+    if (!text) return '';
+    const m = text.match(/\[[^\]]*\]\((https?:\/\/[^)]+)\)/i);
+    if (!m) return '';
+    let url = m[1].trim();
+    while (/[)\].,;:!]+$/.test(url)) url = url.slice(0, -1);
+    return url;
+  }
   parseToolLine(line, categoryName, subcategoryName = null) {
     // Format 1: - **[Naziv](URL)** 💰 - Opis
     // Format 2: - **[Naziv](URL)** 🆕💰 - Opis (više ikona)
@@ -390,10 +408,21 @@ class GitHubCatalogService {
         return null;
       }
       
-      // Provjeri je li valjan URL
+       // Ignoriraj anchor linkove
+      if (website.startsWith('#')) return null;
+
+      // Ako nije http, pokušaj popraviti (www / domain)
       if (!website.startsWith('http')) {
-        return null;
+        if (/^www\./i.test(website) || /^[a-z0-9-]+\.[a-z]{2,}/i.test(website)) {
+          website = `https://${website}`;
+        } else {
+          // fallback: probaj naći http url u ostatku linije
+          const fallbackUrl = this.extractFirstHttpUrl(rest) || this.extractMarkdownUrl(rest);
+          if (fallbackUrl) website = fallbackUrl;
+        }
       }
+
+      if (!website.startsWith('http')) return null;
       
       // Parsiraj pricing ikone i opis
       const { pricing, description } = this.parsePricingAndDescription(rest);
@@ -420,10 +449,22 @@ class GitHubCatalogService {
         return null;
       }
       
-      // Provjeri je li valjan URL
+            // Ignoriraj anchor linkove
+      if (website.startsWith('#')) return null;
+
+      // Ako nije http, pokušaj popraviti (www / domain)
       if (!website.startsWith('http')) {
-        return null;
+        if (/^www\./i.test(website) || /^[a-z0-9-]+\.[a-z]{2,}/i.test(website)) {
+          website = `https://${website}`;
+        } else {
+          // fallback: probaj naći http url u ostatku linije
+          const fallbackUrl = this.extractFirstHttpUrl(rest) || this.extractMarkdownUrl(rest);
+          if (fallbackUrl) website = fallbackUrl;
+        }
       }
+
+      if (!website.startsWith('http')) return null;
+
       
       const { pricing, description } = this.parsePricingAndDescription(rest);
       
@@ -440,6 +481,9 @@ class GitHubCatalogService {
     // Format 6: - Naziv (bez linka)
     match = line.match(/^[\*\-\+]\s+([^\-\*\[]+?)(?:\s*-\s*(.+))?$/);
     if (match) {
+      // pokušaj izvući URL iz cijele linije (često se url nalazi na kraju)
+      const urlFromLine = this.extractFirstHttpUrl(line) || this.extractMarkdownUrl(line);
+
       let toolName = match[1].trim();
       const description = match[2] ? match[2].trim() : '';
       
@@ -465,7 +509,7 @@ class GitHubCatalogService {
           pricing: pricing,
           category: categoryName,
           subcategory: subcategoryName,
-          website: '',
+          website: urlFromLine || '',
         };
       }
       
@@ -475,7 +519,7 @@ class GitHubCatalogService {
         pricing: 'free',
         category: categoryName,
         subcategory: subcategoryName,
-        website: '',
+        website: urlFromLine || '',
       };
     }
     
