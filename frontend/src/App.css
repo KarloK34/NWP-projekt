@@ -40,3 +40,23 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Tool Card hover effect */
+a[href*="/tool/"] {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+a[href*="/tool/"]:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Search input focus effect */
+input[type="text"]:focus {
+  border-color: #3498db !important;
+}
+
+/* Responsive styles for Home page */
+@media (max-width: 768px) {
+  /* This will be applied via inline styles in Home.jsx */
+}

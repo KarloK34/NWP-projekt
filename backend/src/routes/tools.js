@@ -25,12 +25,12 @@ const toolValidation = [
     .trim()
     .isLength({ min: 10, max: 2000 })
     .withMessage('Opis mora imati 10-2000 znakova'),
-  body('websiteUrl')
+  body('website')
     .optional({ nullable: true })
     .isString()
     .trim()
     .isLength({ max: 500 })
-    .withMessage('websiteUrl predugačak'),
+    .withMessage('website predugačak'),
   body('pricing')
     .optional()
     .isIn(pricingEnum)

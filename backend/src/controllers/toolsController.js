@@ -121,13 +121,13 @@ const getTools = async (req, res, next) => {
       filter.models = modelIds.length === 0 ? { $in: [] } : { $in: modelIds };
     }
 
-    // search (text index)
+    // search by name only (case-insensitive)
     const hasSearch = search && String(search).trim().length > 0;
 
     const sortObj = getSortObject(sort, order);
 
     const findQuery = hasSearch
-      ? { ...filter, $text: { $search: String(search).trim() } }
+      ? { ...filter, name: { $regex: String(search).trim(), $options: 'i' } }
       : filter;
 
     const [items, total] = await Promise.all([
@@ -213,7 +213,7 @@ const createTool = async (req, res, next) => {
     const {
       name,
       description,
-      websiteUrl,
+      website,
       pricing,
       category,
       tags = [],
@@ -224,7 +224,7 @@ const createTool = async (req, res, next) => {
     const tool = await Tool.create({
       name,
       description,
-      websiteUrl,
+      website,
       pricing,
       category,
       tags,
@@ -275,7 +275,7 @@ const updateTool = async (req, res, next) => {
     const update = {
       name: req.body.name,
       description: req.body.description,
-      websiteUrl: req.body.websiteUrl,
+      website: req.body.website,
       pricing: req.body.pricing,
       category: req.body.category,
       tags: req.body.tags,
