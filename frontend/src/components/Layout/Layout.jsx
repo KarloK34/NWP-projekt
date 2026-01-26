@@ -16,10 +16,15 @@ const styles = {
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column',
+    width: '100%',
+    margin: 0,
+    padding: 0,
   },
   main: {
     flex: 1,
     width: '100%',
+    margin: 0,
+    padding: 0,
   },
 };
 
