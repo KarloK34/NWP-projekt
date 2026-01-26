@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Admin from './pages/Admin';
+import ToolDetails from './pages/ToolDetails';
 import './App.css';
 
 function App() {
@@ -35,8 +36,7 @@ function App() {
                 </AdminRoute>
               }
             />
-            {/* Placeholder route for tool details - will be implemented in Phase 11 */}
-            <Route path="/tool/:id" element={<Home />} />
+            <Route path="/tool/:id" element={<ToolDetails />} />
           </Routes>
         </Layout>
       </Router>
