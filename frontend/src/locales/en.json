@@ -19,6 +19,7 @@
     "register": "Register",
     "logout": "Log out",
     "profile": "Profile",
+    "watchlist": "Watchlist",
     "admin": "Admin",
     "appName": "AI Tools Catalog"
   },
@@ -100,6 +101,7 @@
     "additionalResources": "Additional resources",
     "visitWebsite": "Visit website",
     "addToWatchlist": "Add to watchlist",
+    "removeFromWatchlist": "Remove from watchlist",
     "loginForWatchlist": "Log in for watchlist",
     "backToHome": "Back to home",
     "notFound": "Tool not found",
@@ -142,7 +144,19 @@
     "email": "Email:",
     "role": "Role:",
     "roleAdmin": "Administrator",
-    "roleUser": "User"
+    "roleUser": "User",
+    "infoSection": "Basic info",
+    "watchlistSection": "Watchlist",
+    "viewAllWatchlist": "View full watchlist",
+    "watchlistEmpty": "You have no tools in your watchlist.",
+    "moreTools": "more tools",
+    "myReviewsSection": "My reviews",
+    "noReviews": "You haven't left any reviews yet."
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "empty": "You have no tools in your watchlist. Add tools from the tools page.",
+    "remove": "Remove"
   },
   "admin": {
     "title": "Admin Panel",

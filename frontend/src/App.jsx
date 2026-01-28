@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import Watchlist from './pages/Watchlist';
 import Admin from './pages/Admin';
 import ToolDetails from './pages/ToolDetails';
 import './App.css';
@@ -29,6 +30,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/watchlist"
+                  element={
+                    <ProtectedRoute>
+                      <Watchlist />
                     </ProtectedRoute>
                   }
                 />

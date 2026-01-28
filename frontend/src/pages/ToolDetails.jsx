@@ -2,6 +2,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import useTool from '../hooks/useTool';
+import useWatchlist from '../hooks/useWatchlist';
 import useWindowSize from '../hooks/useWindowSize';
 import Button from '../components/UI/Button';
 import Spinner from '../components/UI/Spinner';
@@ -20,8 +21,11 @@ const ToolDetails = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { tool, loading, error, refetch: refetchTool } = useTool(id);
+  const { tools: watchlistTools, addToWatchlist, removeFromWatchlist, mutating: watchlistMutating } = useWatchlist();
   const { width } = useWindowSize();
   const isMobile = width < 768;
+
+  const isInWatchlist = tool ? watchlistTools.some((t) => (t._id || t) === (tool._id || tool)) : false;
 
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
@@ -59,12 +63,18 @@ const ToolDetails = () => {
     );
   };
 
-  const handleAddToWatchlist = () => {
+  const handleWatchlistToggle = async () => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
-    alert(t('tool.watchlistPlaceholder'));
+    if (!tool) return;
+    const toolId = tool._id;
+    if (isInWatchlist) {
+      await removeFromWatchlist(toolId);
+    } else {
+      await addToWatchlist(toolId);
+    }
   };
 
   if (loading) {
@@ -139,8 +149,18 @@ const ToolDetails = () => {
                 🌐 {t('tool.visitWebsite')}
               </a>
             )}
-            <Button variant="secondary" onClick={handleAddToWatchlist} className="bg-amber-500 hover:bg-amber-600">
-              {isAuthenticated ? `⭐ ${t('tool.addToWatchlist')}` : `🔒 ${t('tool.loginForWatchlist')}`}
+            <Button
+              variant="secondary"
+              onClick={handleWatchlistToggle}
+              disabled={watchlistMutating}
+              loading={watchlistMutating}
+              className={isInWatchlist ? 'bg-slate-500 hover:bg-slate-600' : 'bg-amber-500 hover:bg-amber-600'}
+            >
+              {!isAuthenticated
+                ? `🔒 ${t('tool.loginForWatchlist')}`
+                : isInWatchlist
+                  ? `✓ ${t('tool.removeFromWatchlist')}`
+                  : `⭐ ${t('tool.addToWatchlist')}`}
             </Button>
           </div>
 

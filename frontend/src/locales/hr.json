@@ -20,6 +20,7 @@
     "register": "Registracija",
     "logout": "Odjavi se",
     "profile": "Profil",
+    "watchlist": "Watchlist",
     "admin": "Admin",
     "appName": "AI Tools Catalog"
   },
@@ -101,6 +102,7 @@
     "additionalResources": "Dodatni resursi",
     "visitWebsite": "Posjeti web stranicu",
     "addToWatchlist": "Dodaj u watchlistu",
+    "removeFromWatchlist": "Ukloni iz watchliste",
     "loginForWatchlist": "Prijavi se za watchlistu",
     "backToHome": "Povratak na početnu",
     "notFound": "Alat nije pronađen",
@@ -143,7 +145,19 @@
     "email": "Email:",
     "role": "Uloga:",
     "roleAdmin": "Administrator",
-    "roleUser": "Korisnik"
+    "roleUser": "Korisnik",
+    "infoSection": "Osnovni podaci",
+    "watchlistSection": "Watchlist",
+    "viewAllWatchlist": "Pogledaj cijelu watchlistu",
+    "watchlistEmpty": "Nemate alata u watchlisti.",
+    "moreTools": "više alata",
+    "myReviewsSection": "Moje recenzije",
+    "noReviews": "Niste još ostavili nijednu recenziju."
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "empty": "Nemate alata u watchlisti. Dodajte alate s stranice alata.",
+    "remove": "Ukloni"
   },
   "admin": {
     "title": "Admin Panel",

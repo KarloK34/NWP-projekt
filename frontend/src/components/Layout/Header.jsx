@@ -43,6 +43,12 @@ const Header = () => {
               >
                 {t('nav.profile')}
               </Link>
+              <Link
+                to="/watchlist"
+                className="text-sm text-white no-underline transition-opacity hover:opacity-90"
+              >
+                {t('nav.watchlist')}
+              </Link>
               {isAdmin() && (
                 <Link
                   to="/admin"

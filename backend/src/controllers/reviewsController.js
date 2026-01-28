@@ -6,6 +6,38 @@ const Tool = require('../models/Tool');
 
 const isObjectId = (v) => mongoose.Types.ObjectId.isValid(v);
 
+/**
+ * Get current user's reviews (for profile page).
+ * GET /api/reviews/me
+ * Requires auth.
+ */
+const getMyReviews = async (req, res, next) => {
+  try {
+    const page = Math.max(parseInt(req.query.page || '1', 10), 1);
+    const limit = Math.min(Math.max(parseInt(req.query.limit || '10', 10), 1), 50);
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await Promise.all([
+      Review.find({ user: req.user.id })
+        .populate('tool', 'name _id')
+        .populate('user', 'username')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Review.countDocuments({ user: req.user.id }),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Recenzije uspješno dohvaćene',
+      data: { page, limit, total, pages: Math.ceil(total / limit), items },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getToolReviews = async (req, res, next) => {
   try {
     const { toolId } = req.params;
@@ -203,6 +235,7 @@ async function recalcToolRating(toolId) {
 }
 
 module.exports = {
+  getMyReviews,
   getToolReviews,
   createReview,
   updateReview,

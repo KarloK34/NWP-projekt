@@ -5,6 +5,9 @@ const reviewsController = require('../controllers/reviewsController');
 
 const router = express.Router();
 
+// GET /api/reviews/me – vlastite recenzije (auth)
+router.get('/me', authenticate, reviewsController.getMyReviews);
+
 // GET /api/tools/:toolId/reviews
 router.get('/tools/:toolId/reviews', reviewsController.getToolReviews);
 
