@@ -86,11 +86,11 @@ const Home = () => {
           aria-label={t('common.close')}
         >
           <div
-            className="w-full max-w-lg rounded-t-xl rounded-b-none bg-white shadow-xl sm:rounded-xl"
+            className="w-full max-w-lg rounded-t-xl rounded-b-none bg-white shadow-xl sm:rounded-xl dark:bg-slate-800 dark:border dark:border-slate-700"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-              <h3 className="m-0 text-lg font-semibold text-slate-800">{t('filters.title')}</h3>
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
+              <h3 className="m-0 text-lg font-semibold text-slate-800 dark:text-slate-100">{t('filters.title')}</h3>
               <button
                 type="button"
                 onClick={() => setShowFilters(false)}
@@ -122,21 +122,21 @@ const Home = () => {
           )}
 
           {error && (
-            <div className="rounded-lg bg-red-50 p-6 text-center text-red-700" role="alert">
+            <div className="rounded-lg bg-red-50 p-6 text-center text-red-700 dark:bg-red-900/30 dark:text-red-300" role="alert">
               <p>❌ {error}</p>
             </div>
           )}
 
           {!loading && !error && tools.length === 0 && (
-            <div className="py-16 text-center text-slate-600">
+            <div className="py-16 text-center text-slate-600 dark:text-slate-400">
               <p className="text-lg">{t('home.noResults')}</p>
-              <p className="mt-2 text-sm text-slate-500">{t('home.tryFilters')}</p>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-500">{t('home.tryFilters')}</p>
             </div>
           )}
 
           {!error && tools.length > 0 && (
             <>
-              <div className="mb-6 text-sm text-slate-600">
+              <div className="mb-6 text-sm text-slate-600 dark:text-slate-400">
                 <p>
                   {t('home.found')} <strong>{pagination.total}</strong> {toolsLabel}
                   {pagination.pages > 1 && (
@@ -162,7 +162,7 @@ const Home = () => {
                   >
                     ← {t('common.previous')}
                   </Button>
-                  <span className="text-sm text-slate-600">
+                  <span className="text-sm text-slate-600 dark:text-slate-400">
                     {t('common.page')} {pagination.page} {t('common.of')} {pagination.pages}
                   </span>
                   <Button

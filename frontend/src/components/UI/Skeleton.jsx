@@ -4,7 +4,7 @@
 export function Skeleton({ className = '', ...props }) {
   return (
     <div
-      className={`animate-pulse rounded-md bg-slate-200 ${className}`.trim()}
+      className={`animate-pulse rounded-md bg-slate-200 dark:bg-slate-700 ${className}`.trim()}
       aria-hidden
       {...props}
     />
@@ -27,7 +27,7 @@ export function SkeletonText({ lines = 3, className = '' }) {
 /** Skeleton za ToolCard – prikaz kartice alata tijekom učitavanja. */
 export function SkeletonToolCard() {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[var(--shadow-card)]">
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[var(--shadow-card)] dark:border-slate-700 dark:bg-slate-800">
       <Skeleton className="mb-4 h-14 w-14 rounded-lg" />
       <Skeleton className="mb-2 h-6 w-3/4" />
       <SkeletonText lines={3} className="mb-4" />

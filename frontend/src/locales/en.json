@@ -122,6 +122,14 @@
     "copyright": "© 2025 AI Tools Catalog. All rights reserved.",
     "credits": "Project by Karlo Kraml and Sven Radić for the course Advanced Web Programming (NWP)."
   },
+  "theme": {
+    "light": "Light theme",
+    "dark": "Dark theme",
+    "system": "System (auto)",
+    "switchToDark": "Switch to dark mode",
+    "switchToLight": "Switch to light mode",
+    "switchToSystem": "Switch to system theme"
+  },
   "language": {
     "label": "Language",
     "hr": "Hrvatski",

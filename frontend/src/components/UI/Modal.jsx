@@ -46,13 +46,13 @@ export default function Modal({
         aria-hidden
       />
       <div
-        className={`relative w-full ${sizeClasses[size]} rounded-xl bg-white shadow-xl`}
+        className={`relative w-full ${sizeClasses[size]} rounded-xl bg-white shadow-xl dark:bg-slate-800 dark:border dark:border-slate-700`}
         onClick={(e) => e.stopPropagation()}
       >
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+          <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-700">
             {title && (
-              <h2 id="modal-title" className="text-lg font-semibold text-slate-800">
+              <h2 id="modal-title" className="text-lg font-semibold text-slate-800 dark:text-slate-100">
                 {title}
               </h2>
             )}

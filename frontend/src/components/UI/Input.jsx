@@ -17,8 +17,9 @@ export default function Input({
     'block w-full rounded-lg border px-3 py-2 text-base shadow-sm transition-colors',
     'border-slate-300 focus:border-primary-500 focus:ring-1 focus:ring-primary-500',
     'placeholder:text-slate-400 disabled:bg-slate-100 disabled:cursor-not-allowed',
+    'dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-700',
     error
-      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+      ? 'border-red-500 focus:border-red-500 focus:ring-red-500 dark:border-red-500'
       : '',
     className,
   ]
@@ -30,7 +31,7 @@ export default function Input({
       {label && (
         <label
           htmlFor={id}
-          className="mb-1 block text-sm font-medium text-slate-700"
+          className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
         >
           {label}
         </label>
@@ -51,7 +52,7 @@ export default function Input({
         </p>
       )}
       {hint && !error && (
-        <p id={`${id}-hint`} className="mt-1 text-sm text-slate-500">
+        <p id={`${id}-hint`} className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           {hint}
         </p>
       )}

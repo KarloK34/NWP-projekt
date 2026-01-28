@@ -87,6 +87,7 @@ Frontend aplikacija će biti dostupna na `http://localhost:3000`
 - ✅ Reusable UI komponente (Button, Input, Card, Modal, Spinner, Skeleton, Toast)
 - ✅ Toast obavijesti (success/error/info/warning)
 - ✅ Internacionalizacija (i18n): hrvatski (zadano) i engleski, prekidač jezika u headeru
+- ✅ Dark mode: prekidač u headeru (svjetla / tamna / sustav), preferencija se sprema u localStorage
 
 ## Autori
 

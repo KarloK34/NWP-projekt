@@ -123,6 +123,14 @@
     "copyright": "© 2025 AI Tools Catalog. Sva prava pridržana.",
     "credits": "Projekt izradili Karlo Kraml i Sven Radić za kolegij Napredno Web Programiranje (NWP)."
   },
+  "theme": {
+    "light": "Svjetla tema",
+    "dark": "Tamna tema",
+    "system": "Sustav (automatski)",
+    "switchToDark": "Prebaci na tamnu temu",
+    "switchToLight": "Prebaci na svjetlu temu",
+    "switchToSystem": "Prebaci na temu sustava"
+  },
   "language": {
     "label": "Jezik",
     "hr": "Hrvatski",

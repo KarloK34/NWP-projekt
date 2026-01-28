@@ -80,13 +80,13 @@ const Register = () => {
   return (
     <div className="flex min-h-[calc(100vh-200px)] items-center justify-center p-8">
       <Card className="w-full max-w-md">
-        <h1 className="mb-6 text-center text-2xl font-bold text-slate-800">
+        <h1 className="mb-6 text-center text-2xl font-bold text-slate-800 dark:text-slate-100">
           {t('auth.registerTitle')}
         </h1>
 
         {error && (
           <div
-            className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700"
+            className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-300"
             role="alert"
           >
             {error}
@@ -153,7 +153,7 @@ const Register = () => {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-600">
+        <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
           {t('auth.hasAccount')}{' '}
           <Link to="/login" className="text-primary-600 hover:underline">
             {t('auth.loginLink')}

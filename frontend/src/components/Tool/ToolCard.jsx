@@ -24,7 +24,7 @@ const ToolCard = ({ tool }) => {
         {[...Array(emptyStars)].map((_, i) => (
           <span key={i} className="text-slate-300 text-base">☆</span>
         ))}
-        <span className="ml-2 text-sm text-slate-600">
+        <span className="ml-2 text-sm text-slate-600 dark:text-slate-400">
           {rating > 0 ? rating.toFixed(1) : t('tool.rating')} ({tool.reviewCount || 0} {t('tool.reviews')})
         </span>
       </div>
@@ -49,7 +49,7 @@ const ToolCard = ({ tool }) => {
   return (
     <Link
       to={`/tool/${tool._id}`}
-      className="block h-full overflow-hidden rounded-xl border border-slate-200 bg-white text-inherit no-underline shadow-[var(--shadow-card)] transition-all hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-0.5"
+      className="block h-full overflow-hidden rounded-xl border border-slate-200 bg-white text-inherit no-underline shadow-[var(--shadow-card)] transition-all hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-800"
     >
       <div className="flex h-full flex-col p-6">
         {tool.logo && (
@@ -57,16 +57,16 @@ const ToolCard = ({ tool }) => {
             <img src={tool.logo} alt={tool.name} className="h-full w-full object-cover" />
           </div>
         )}
-        <h3 className="mb-2 text-lg font-bold text-slate-800">{tool.name}</h3>
-        <p className="mb-4 flex-1 text-sm leading-relaxed text-slate-600">
+        <h3 className="mb-2 text-lg font-bold text-slate-800 dark:text-slate-100">{tool.name}</h3>
+        <p className="mb-4 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
           {tool.description.length > 150
             ? `${tool.description.substring(0, 150)}...`
             : tool.description}
         </p>
         {tool.category && (
           <div className="mb-3 flex items-center gap-2 text-sm">
-            <span className="text-slate-500">{t('tool.category')}</span>
-            <span className="font-medium text-primary-600">{tool.category.name}</span>
+            <span className="text-slate-500 dark:text-slate-400">{t('tool.category')}</span>
+            <span className="font-medium text-primary-600 dark:text-primary-400">{tool.category.name}</span>
           </div>
         )}
         {renderStars(tool.rating || 0)}
@@ -75,7 +75,7 @@ const ToolCard = ({ tool }) => {
             {tool.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag._id || tag}
-                className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-600"
+                className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300"
               >
                 {tag.name || tag}
               </span>

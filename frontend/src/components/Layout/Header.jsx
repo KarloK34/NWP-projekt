@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import useWindowSize from '../../hooks/useWindowSize';
 import LanguageSwitcher from './LanguageSwitcher';
+import ThemeToggle from './ThemeToggle';
 import Button from '../UI/Button';
 
 const Header = () => {
@@ -18,7 +19,7 @@ const Header = () => {
   };
 
   return (
-    <header className="w-full bg-slate-800 text-white shadow-md">
+    <header className="w-full bg-slate-800 text-white shadow-md dark:bg-slate-900">
       <div className="container-app flex flex-wrap items-center justify-between gap-2 py-4">
         {!isMobile && (
           <Link to="/" className="text-white no-underline hover:text-white/90">
@@ -79,6 +80,7 @@ const Header = () => {
             </>
           )}
 
+          <ThemeToggle />
           <LanguageSwitcher />
         </nav>
       </div>

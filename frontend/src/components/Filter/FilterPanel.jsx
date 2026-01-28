@@ -104,8 +104,8 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
 
   if (loading) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[var(--shadow-card)]">
-        <div className="flex items-center justify-center gap-2 text-slate-600">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[var(--shadow-card)] dark:border-slate-700 dark:bg-slate-800">
+        <div className="flex items-center justify-center gap-2 text-slate-600 dark:text-slate-400">
           <Spinner size="sm" />
           <span>{t('filters.loading')}</span>
         </div>
@@ -114,22 +114,22 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[var(--shadow-card)]">
-      <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-4">
-        <h3 className="m-0 text-lg font-bold text-slate-800">{t('filters.title')}</h3>
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[var(--shadow-card)] dark:border-slate-700 dark:bg-slate-800">
+      <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-700">
+        <h3 className="m-0 text-lg font-bold text-slate-800 dark:text-slate-100">{t('filters.title')}</h3>
         <Button variant="danger" size="sm" onClick={clearFilters}>
           {t('filters.reset')}
         </Button>
       </div>
 
       <div className="mb-6">
-        <label className="mb-2 block text-sm font-semibold text-slate-700">
+        <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
           {t('filters.sort')}
         </label>
         <select
           value={`${filters.sort || 'rating'}-${filters.order || 'desc'}`}
           onChange={(e) => handleSortChange(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
         >
           <option value="rating-desc">{t('filters.sortRatingDesc')}</option>
           <option value="rating-asc">{t('filters.sortRatingAsc')}</option>
@@ -141,14 +141,14 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
       </div>
 
       <div className="mb-6">
-        <label className="mb-2 block text-sm font-semibold text-slate-700">
+        <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
           {t('filters.price')}
         </label>
         <div className="flex flex-col gap-2">
           {['free', 'paid', 'freemium'].map((pricing) => (
             <label
               key={pricing}
-              className="flex cursor-pointer items-center gap-2 text-sm"
+              className="flex cursor-pointer items-center gap-2 text-sm dark:text-slate-300"
             >
               <input
                 type="radio"
@@ -164,7 +164,7 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
       </div>
 
       <div className="mb-6">
-        <label className="mb-2 block text-sm font-semibold text-slate-700">
+        <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
           {t('filters.minRating')}
         </label>
         <select
@@ -172,7 +172,7 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
           onChange={(e) =>
             handleMinRatingChange(e.target.value ? Number(e.target.value) : null)
           }
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
         >
           <option value="">{t('filters.allRatings')}</option>
           <option value="1">{t('filters.stars1')}</option>
@@ -185,14 +185,14 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
 
       {categories.length > 0 && (
         <div className="mb-6">
-          <label className="mb-2 block text-sm font-semibold text-slate-700">
+          <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
             {t('filters.categories')}
           </label>
           <div className="max-h-[200px] flex flex-col gap-2 overflow-y-auto">
             {categories.map((category) => (
               <label
                 key={category._id}
-                className="flex cursor-pointer items-center gap-2 text-sm"
+                className="flex cursor-pointer items-center gap-2 text-sm dark:text-slate-300"
               >
                 <input
                   type="checkbox"
@@ -209,14 +209,14 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
 
       {tags.length > 0 && (
         <div>
-          <label className="mb-2 block text-sm font-semibold text-slate-700">
+          <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
             {t('filters.tags')}
           </label>
           <div className="max-h-[200px] flex flex-col gap-2 overflow-y-auto">
             {tags.slice(0, 10).map((tag) => (
               <label
                 key={tag._id}
-                className="flex cursor-pointer items-center gap-2 text-sm"
+                className="flex cursor-pointer items-center gap-2 text-sm dark:text-slate-300"
               >
                 <input
                   type="checkbox"
@@ -228,7 +228,7 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
               </label>
             ))}
             {tags.length > 10 && (
-              <p className="mt-2 text-xs italic text-slate-500">
+              <p className="mt-2 text-xs italic text-slate-500 dark:text-slate-400">
                 {t('filters.moreTags', { count: tags.length - 10 })}
               </p>
             )}
