@@ -1,12 +1,16 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useTools from '../hooks/useTools';
 import useDebounce from '../hooks/useDebounce';
 import useWindowSize from '../hooks/useWindowSize';
 import SearchBar from '../components/Search/SearchBar';
 import FilterPanel from '../components/Filter/FilterPanel';
 import ToolCard from '../components/Tool/ToolCard';
+import { SkeletonToolGrid } from '../components/UI/Skeleton';
+import Button from '../components/UI/Button';
 
 const Home = () => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     page: 1,
@@ -27,7 +31,7 @@ const Home = () => {
 
   const handleSearchChange = (value) => {
     setSearchQuery(value);
-    setFilters((prev) => ({ ...prev, page: 1 })); // Reset to first page on search
+    setFilters((prev) => ({ ...prev, page: 1 }));
   };
 
   const handleFiltersChange = (newFilters) => {
@@ -39,150 +43,135 @@ const Home = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const responsiveStyles = getResponsiveStyles(isMobile);
-  const containerStyle = { ...styles.container, ...responsiveStyles.container };
-  const contentStyle = { ...styles.content, ...responsiveStyles.content };
-  const toolsGridStyle = { ...styles.toolsGrid, ...responsiveStyles.toolsGrid };
-  const searchBarWrapperStyle = { ...styles.searchBarWrapper, ...responsiveStyles.searchBarWrapper };
+  const toolsLabel = pagination.total === 1 ? t('home.tools') : t('home.tools_plural');
 
   return (
-    <div style={containerStyle}>
-      {/* Search Bar */}
-      <div style={styles.searchSection}>
-        <div style={searchBarWrapperStyle}>
+    <div className="container-app w-full p-6 md:p-8">
+      <div className="mb-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
           <SearchBar
             value={searchQuery}
             onChange={handleSearchChange}
-            placeholder="Pretraži alate po nazivu..."
+            placeholder={t('home.searchPlaceholder')}
           />
           {isMobile && (
-            <button
+            <Button
+              variant="primary"
               onClick={() => setShowFilters(!showFilters)}
-              style={styles.filterToggleBtn}
-              aria-label="Toggle filters"
+              className="flex items-center justify-center gap-2 sm:w-auto"
+              aria-label={t('home.toggleFilters')}
             >
               <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
+                className="size-5"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                viewBox="0 0 24 24"
+                aria-hidden
               >
-                <line x1="4" y1="21" x2="4" y2="14"></line>
-                <line x1="4" y1="10" x2="4" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12" y2="3"></line>
-                <line x1="20" y1="21" x2="20" y2="16"></line>
-                <line x1="20" y1="12" x2="20" y2="3"></line>
-                <line x1="1" y1="14" x2="7" y2="14"></line>
-                <line x1="9" y1="8" x2="15" y2="8"></line>
-                <line x1="17" y1="16" x2="23" y2="16"></line>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
-              Filteri
-            </button>
+              {t('home.toggleFilters')}
+            </Button>
           )}
         </div>
       </div>
 
-      {/* Mobile Filter Overlay */}
       {isMobile && showFilters && (
-        <div style={styles.filterOverlay} onClick={() => setShowFilters(false)}>
-          <div style={styles.filterPanelMobile} onClick={(e) => e.stopPropagation()}>
-            <div style={styles.filterHeader}>
-              <h3 style={styles.filterTitle}>Filteri</h3>
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/50 p-4 sm:items-center"
+          onClick={() => setShowFilters(false)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Escape' && setShowFilters(false)}
+          aria-label={t('common.close')}
+        >
+          <div
+            className="w-full max-w-lg rounded-t-xl rounded-b-none bg-white shadow-xl sm:rounded-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+              <h3 className="m-0 text-lg font-semibold text-slate-800">{t('filters.title')}</h3>
               <button
+                type="button"
                 onClick={() => setShowFilters(false)}
-                style={styles.closeBtn}
-                aria-label="Close filters"
+                className="rounded-full p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                aria-label={t('home.closeFilters')}
               >
-                ✕
+                <span aria-hidden>✕</span>
               </button>
             </div>
-            <FilterPanel filters={filters} onFiltersChange={handleFiltersChange} />
+            <div className="max-h-[70vh] overflow-y-auto p-4">
+              <FilterPanel filters={filters} onFiltersChange={handleFiltersChange} />
+            </div>
           </div>
         </div>
       )}
 
-      <div style={contentStyle}>
-        {/* Filter Panel - Desktop */}
+      <div className="grid gap-8 lg:grid-cols-[280px_1fr] lg:items-start">
         {!isMobile && (
-          <aside style={styles.sidebar}>
+          <aside className="sticky top-8 max-h-[calc(100vh-4rem)] overflow-y-auto">
             <FilterPanel filters={filters} onFiltersChange={handleFiltersChange} />
           </aside>
         )}
 
-        {/* Tools List */}
-        <main style={styles.main}>
-          {/* Show loading only on initial load (when no tools exist yet) */}
+        <main className="min-h-[400px]">
           {loading && tools.length === 0 && (
-            <div style={styles.loading}>
-              <p>Učitavanje alata...</p>
+            <div className="py-16 text-center">
+              <SkeletonToolGrid count={6} />
             </div>
           )}
 
           {error && (
-            <div style={styles.error}>
+            <div className="rounded-lg bg-red-50 p-6 text-center text-red-700" role="alert">
               <p>❌ {error}</p>
             </div>
           )}
 
           {!loading && !error && tools.length === 0 && (
-            <div style={styles.empty}>
-              <p>Nema pronađenih alata.</p>
-              <p style={styles.emptySubtext}>
-                Pokušajte promijeniti filtere ili pretragu.
-              </p>
+            <div className="py-16 text-center text-slate-600">
+              <p className="text-lg">{t('home.noResults')}</p>
+              <p className="mt-2 text-sm text-slate-500">{t('home.tryFilters')}</p>
             </div>
           )}
 
           {!error && tools.length > 0 && (
             <>
-              <div style={styles.resultsInfo}>
+              <div className="mb-6 text-sm text-slate-600">
                 <p>
-                  Pronađeno <strong>{pagination.total}</strong> alat{pagination.total !== 1 ? 'a' : ''}
+                  {t('home.found')} <strong>{pagination.total}</strong> {toolsLabel}
                   {pagination.pages > 1 && (
-                    <span> (stranica {pagination.page} od {pagination.pages})</span>
+                    <span>
+                      {' '}({t('common.page')} {pagination.page} {t('common.of')} {pagination.pages})
+                    </span>
                   )}
                 </p>
               </div>
 
-              <div style={toolsGridStyle}>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {tools.map((tool) => (
                   <ToolCard key={tool._id} tool={tool} />
                 ))}
               </div>
 
-              {/* Pagination */}
               {pagination.pages > 1 && (
-                <div style={styles.pagination}>
-                  <button
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-4 py-4">
+                  <Button
+                    variant="secondary"
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page === 1}
-                    style={{
-                      ...styles.paginationBtn,
-                      ...(pagination.page === 1 ? styles.paginationBtnDisabled : {}),
-                    }}
                   >
-                    ← Prethodna
-                  </button>
-
-                  <div style={styles.paginationInfo}>
-                    Stranica {pagination.page} od {pagination.pages}
-                  </div>
-
-                  <button
+                    ← {t('common.previous')}
+                  </Button>
+                  <span className="text-sm text-slate-600">
+                    {t('common.page')} {pagination.page} {t('common.of')} {pagination.pages}
+                  </span>
+                  <Button
+                    variant="secondary"
                     onClick={() => handlePageChange(pagination.page + 1)}
                     disabled={pagination.page >= pagination.pages}
-                    style={{
-                      ...styles.paginationBtn,
-                      ...(pagination.page >= pagination.pages ? styles.paginationBtnDisabled : {}),
-                    }}
                   >
-                    Sljedeća →
-                  </button>
+                    {t('common.next')} →
+                  </Button>
                 </div>
               )}
             </>
@@ -191,197 +180,6 @@ const Home = () => {
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    width: '100%',
-    margin: 0,
-    padding: '2rem',
-  },
-  searchSection: {
-    marginBottom: '2rem',
-  },
-  searchBarWrapper: {
-    display: 'flex',
-    gap: '1rem',
-    alignItems: 'center',
-  },
-  filterToggleBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    padding: '0.75rem 1rem',
-    backgroundColor: '#3498db',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '0.9rem',
-    fontWeight: '500',
-    whiteSpace: 'nowrap',
-    transition: 'background-color 0.2s ease',
-  },
-  content: {
-    display: 'grid',
-    gridTemplateColumns: '280px 1fr',
-    gap: '2rem',
-    alignItems: 'start',
-  },
-  sidebar: {
-    position: 'sticky',
-    top: '2rem',
-    maxHeight: 'calc(100vh - 4rem)',
-    overflowY: 'auto',
-  },
-  filterOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 1000,
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    padding: '1rem',
-    overflowY: 'auto',
-  },
-  filterPanelMobile: {
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    width: '100%',
-    maxWidth: '500px',
-    maxHeight: '90vh',
-    overflowY: 'auto',
-    marginTop: 'auto',
-    marginBottom: 'auto',
-  },
-  filterHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '1rem',
-    borderBottom: '2px solid #ecf0f1',
-    position: 'sticky',
-    top: 0,
-    backgroundColor: '#fff',
-    zIndex: 1,
-    borderRadius: '8px 8px 0 0',
-  },
-  filterTitle: {
-    margin: 0,
-    fontSize: '1.25rem',
-    fontWeight: 'bold',
-    color: '#2c3e50',
-  },
-  closeBtn: {
-    backgroundColor: '#e74c3c',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '50%',
-    width: '32px',
-    height: '32px',
-    cursor: 'pointer',
-    fontSize: '1.2rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'background-color 0.2s',
-  },
-  main: {
-    minHeight: '400px',
-  },
-  loading: {
-    textAlign: 'center',
-    padding: '4rem 2rem',
-    fontSize: '1.1rem',
-    color: '#666',
-  },
-  error: {
-    textAlign: 'center',
-    padding: '2rem',
-    backgroundColor: '#fee',
-    borderRadius: '8px',
-    color: '#c33',
-  },
-  empty: {
-    textAlign: 'center',
-    padding: '4rem 2rem',
-    color: '#666',
-  },
-  emptySubtext: {
-    fontSize: '0.9rem',
-    color: '#999',
-    marginTop: '0.5rem',
-  },
-  resultsInfo: {
-    marginBottom: '1.5rem',
-    fontSize: '0.9rem',
-    color: '#666',
-  },
-  toolsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-    gap: '1.5rem',
-    marginBottom: '2rem',
-  },
-  pagination: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '1rem',
-    marginTop: '2rem',
-    padding: '1rem',
-  },
-  paginationBtn: {
-    padding: '0.75rem 1.5rem',
-    backgroundColor: '#3498db',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '0.9rem',
-    fontWeight: '500',
-    transition: 'background-color 0.2s ease',
-  },
-  paginationBtnDisabled: {
-    backgroundColor: '#bdc3c7',
-    cursor: 'not-allowed',
-    opacity: 0.6,
-  },
-  paginationInfo: {
-    fontSize: '0.9rem',
-    color: '#666',
-  },
-};
-
-// Responsive styles
-const getResponsiveStyles = (isMobile) => {
-  if (!isMobile) return {};
-  
-  return {
-    container: {
-      padding: '1rem',
-    },
-    content: {
-      gridTemplateColumns: '1fr',
-      gap: '1rem',
-    },
-    toolsGrid: {
-      gridTemplateColumns: '1fr',
-      gap: '1rem',
-    },
-    searchBarWrapper: {
-      flexDirection: 'column',
-      alignItems: 'stretch',
-    },
-    filterToggleBtn: {
-      width: '100%',
-      justifyContent: 'center',
-    },
-  };
 };
 
 export default Home;

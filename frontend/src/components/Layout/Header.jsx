@@ -1,8 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import useWindowSize from '../../hooks/useWindowSize';
+import LanguageSwitcher from './LanguageSwitcher';
+import Button from '../UI/Button';
 
 const Header = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { width } = useWindowSize();
@@ -14,117 +18,72 @@ const Header = () => {
   };
 
   return (
-    <header style={styles.header}>
-      <div style={styles.container}>
+    <header className="w-full bg-slate-800 text-white shadow-md">
+      <div className="container-app flex flex-wrap items-center justify-between gap-2 py-4">
         {!isMobile && (
-          <Link to="/" style={styles.logo}>
-            <h1 style={styles.logoH1}>AI Tools Catalog</h1>
+          <Link to="/" className="text-white no-underline hover:text-white/90">
+            <h1 className="m-0 text-xl font-bold">{t('nav.appName')}</h1>
           </Link>
         )}
 
-        <nav style={styles.nav}>
-          <Link to="/" style={styles.navLink}>
-            Početna
+        <nav className="flex flex-wrap items-center gap-4">
+          <Link
+            to="/"
+            className="text-sm text-white no-underline transition-opacity hover:opacity-90"
+          >
+            {t('nav.home')}
           </Link>
 
           {isAuthenticated ? (
             <>
-              <Link to="/profile" style={styles.navLink}>
-                Profil
+              <Link
+                to="/profile"
+                className="text-sm text-white no-underline transition-opacity hover:opacity-90"
+              >
+                {t('nav.profile')}
               </Link>
               {isAdmin() && (
-                <Link to="/admin" style={styles.navLink}>
-                  Admin
+                <Link
+                  to="/admin"
+                  className="text-sm text-white no-underline transition-opacity hover:opacity-90"
+                >
+                  {t('nav.admin')}
                 </Link>
               )}
-              <div style={styles.userSection}>
-                <span style={styles.username}>{user?.username}</span>
-                <button onClick={handleLogout} style={styles.logoutBtn}>
-                  Odjavi se
-                </button>
+              <div className="ml-2 flex flex-wrap items-center gap-2 border-l border-white/30 pl-2">
+                <span className="text-sm opacity-90">{user?.username}</span>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="whitespace-nowrap"
+                >
+                  {t('nav.logout')}
+                </Button>
               </div>
             </>
           ) : (
             <>
-              <Link to="/login" style={styles.navLink}>
-                Prijava
+              <Link
+                to="/login"
+                className="text-sm text-white no-underline transition-opacity hover:opacity-90"
+              >
+                {t('nav.login')}
               </Link>
-              <Link to="/register" style={styles.navLink}>
-                Registracija
+              <Link
+                to="/register"
+                className="text-sm text-white no-underline transition-opacity hover:opacity-90"
+              >
+                {t('nav.register')}
               </Link>
             </>
           )}
+
+          <LanguageSwitcher />
         </nav>
       </div>
     </header>
   );
 };
 
-const styles = {
-  header: {
-    backgroundColor: '#2c3e50',
-    color: '#fff',
-    padding: '1rem 0',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    width: '100%',
-  },
-  container: {
-    width: '100%',
-    margin: 0,
-    padding: '0 1rem',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '0.5rem',
-  },
-  logo: {
-    textDecoration: 'none',
-    color: '#fff',
-  },
-  logoH1: {
-    margin: 0,
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-  },
-  nav: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem',
-    flexWrap: 'wrap',
-  },
-  navLink: {
-    color: '#fff',
-    textDecoration: 'none',
-    fontSize: '0.9rem',
-    transition: 'opacity 0.2s',
-    whiteSpace: 'nowrap',
-  },
-  userSection: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    marginLeft: '0.5rem',
-    paddingLeft: '0.5rem',
-    borderLeft: '1px solid rgba(255,255,255,0.3)',
-    flexWrap: 'wrap',
-  },
-  username: {
-    fontSize: '0.9rem',
-    opacity: 0.9,
-  },
-  logoutBtn: {
-    backgroundColor: '#e74c3c',
-    color: '#fff',
-    border: 'none',
-    padding: '0.5rem 0.75rem',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '0.85rem',
-    transition: 'background-color 0.2s',
-    whiteSpace: 'nowrap',
-  },
-};
-
 export default Header;
-

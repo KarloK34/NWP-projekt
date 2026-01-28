@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import AdminRoute from './components/Auth/AdminRoute';
@@ -14,7 +15,8 @@ import './App.css';
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <ToastProvider>
+        <Router>
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -39,7 +41,8 @@ function App() {
             <Route path="/tool/:id" element={<ToolDetails />} />
           </Routes>
         </Layout>
-      </Router>
+        </Router>
+      </ToastProvider>
     </AuthProvider>
   );
 }

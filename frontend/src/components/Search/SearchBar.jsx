@@ -1,42 +1,24 @@
-const SearchBar = ({ value, onChange, placeholder = 'Pretraži alate...' }) => {
+import { useTranslation } from 'react-i18next';
+
+const SearchBar = ({ value, onChange, placeholder }) => {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t('home.searchPlaceholder');
+
   return (
-    <div style={styles.container}>
+    <div className="relative w-full max-w-[600px] mx-auto">
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        style={styles.input}
+        placeholder={resolvedPlaceholder}
+        className="w-full rounded-lg border-2 border-slate-300 px-4 py-3 pr-12 text-base outline-none transition-colors focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+        aria-label={t('common.search')}
       />
-      <span style={styles.icon}>🔍</span>
+      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xl" aria-hidden>
+        🔍
+      </span>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    position: 'relative',
-    width: '100%',
-    maxWidth: '600px',
-    margin: '0 auto',
-  },
-  input: {
-    width: '100%',
-    padding: '0.75rem 3rem 0.75rem 1rem',
-    fontSize: '1rem',
-    border: '2px solid #ddd',
-    borderRadius: '8px',
-    outline: 'none',
-    transition: 'border-color 0.3s ease',
-  },
-  icon: {
-    position: 'absolute',
-    right: '1rem',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    fontSize: '1.2rem',
-    pointerEvents: 'none',
-  },
 };
 
 export default SearchBar;

@@ -1,37 +1,16 @@
+import { useTranslation } from 'react-i18next';
+
 const Admin = () => {
+  const { t } = useTranslation();
+
   return (
-    <div style={styles.container}>
-      <div style={styles.content}>
-        <h1 style={styles.title}>Admin Panel</h1>
-        <p style={styles.note}>
-          Admin funkcionalnosti će biti implementirane u Fazi 12
-        </p>
+    <div className="mx-auto max-w-4xl p-8">
+      <div className="text-center py-16 px-8">
+        <h1 className="mb-4 text-3xl font-bold text-slate-800">{t('admin.title')}</h1>
+        <p className="text-slate-500 italic">{t('admin.comingSoon')}</p>
       </div>
     </div>
   );
 };
 
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '2rem',
-  },
-  content: {
-    textAlign: 'center',
-    padding: '4rem 2rem',
-  },
-  title: {
-    fontSize: '2.5rem',
-    marginBottom: '1rem',
-    color: '#2c3e50',
-  },
-  note: {
-    fontSize: '1rem',
-    color: '#999',
-    fontStyle: 'italic',
-  },
-};
-
 export default Admin;
-

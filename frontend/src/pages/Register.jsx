@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { Card } from '../components/UI/Card';
+import Input from '../components/UI/Input';
+import Button from '../components/UI/Button';
 
 const Register = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -23,29 +28,26 @@ const Register = () => {
 
   const validateForm = () => {
     if (formData.password !== formData.confirmPassword) {
-      setError('Lozinke se ne podudaraju');
+      setError(t('auth.passwordsMismatch'));
       return false;
     }
 
     if (formData.password.length < 6) {
-      setError('Lozinka mora imati najmanje 6 znakova');
+      setError(t('auth.passwordMinLength'));
       return false;
     }
 
-    // Check password strength
     const hasUpperCase = /[A-Z]/.test(formData.password);
     const hasLowerCase = /[a-z]/.test(formData.password);
     const hasNumber = /[0-9]/.test(formData.password);
 
     if (!hasUpperCase || !hasLowerCase || !hasNumber) {
-      setError(
-        'Lozinka mora sadržavati najmanje jedno malo slovo, jedno veliko slovo i jedan broj'
-      );
+      setError(t('auth.passwordRequirements'));
       return false;
     }
 
     if (formData.username.length < 3) {
-      setError('Korisničko ime mora imati najmanje 3 znaka');
+      setError(t('auth.usernameMinLength'));
       return false;
     }
 
@@ -56,9 +58,7 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
 
@@ -71,183 +71,97 @@ const Register = () => {
     if (result.success) {
       navigate('/');
     } else {
-      setError(result.error || 'Greška pri registraciji');
+      setError(result.error || t('auth.registerError'));
     }
 
     setLoading(false);
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>Registracija</h1>
+    <div className="flex min-h-[calc(100vh-200px)] items-center justify-center p-8">
+      <Card className="w-full max-w-md">
+        <h1 className="mb-6 text-center text-2xl font-bold text-slate-800">
+          {t('auth.registerTitle')}
+        </h1>
 
-        {error && <div style={styles.error}>{error}</div>}
-
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.formGroup}>
-            <label htmlFor="username" style={styles.label}>
-              Korisničko ime
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-              minLength={3}
-              maxLength={30}
-              style={styles.input}
-              placeholder="korisnicko_ime"
-            />
+        {error && (
+          <div
+            className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700"
+            role="alert"
+          >
+            {error}
           </div>
+        )}
 
-          <div style={styles.formGroup}>
-            <label htmlFor="email" style={styles.label}>
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              style={styles.input}
-              placeholder="unesite@email.com"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <Input
+            id="username"
+            label={t('auth.username')}
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+            minLength={3}
+            maxLength={30}
+            placeholder={t('auth.usernamePlaceholder')}
+          />
 
-          <div style={styles.formGroup}>
-            <label htmlFor="password" style={styles.label}>
-              Lozinka
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              minLength={6}
-              style={styles.input}
-              placeholder="Unesite lozinku"
-            />
-            <small style={styles.hint}>
-              Najmanje 6 znakova, mora sadržavati veliko i malo slovo i broj
-            </small>
-          </div>
+          <Input
+            id="email"
+            label={t('auth.email')}
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            placeholder={t('auth.emailPlaceholder')}
+          />
 
-          <div style={styles.formGroup}>
-            <label htmlFor="confirmPassword" style={styles.label}>
-              Potvrdite lozinku
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-              style={styles.input}
-              placeholder="Ponovite lozinku"
-            />
-          </div>
+          <Input
+            id="password"
+            label={t('auth.password')}
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            minLength={6}
+            placeholder={t('auth.passwordPlaceholder')}
+            hint={t('auth.passwordHint')}
+          />
 
-          <button
+          <Input
+            id="confirmPassword"
+            label={t('auth.confirmPassword')}
+            name="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+            placeholder={t('auth.confirmPasswordPlaceholder')}
+          />
+
+          <Button
             type="submit"
             disabled={loading}
-            style={styles.submitBtn}
+            loading={loading}
+            variant="accent"
+            fullWidth
+            className="mt-2"
           >
-            {loading ? 'Registracija...' : 'Registriraj se'}
-          </button>
+            {loading ? t('auth.registerLoading') : t('auth.registerButton')}
+          </Button>
         </form>
 
-        <p style={styles.footer}>
-          Već imate račun? <Link to="/login">Prijavite se</Link>
+        <p className="mt-6 text-center text-sm text-slate-600">
+          {t('auth.hasAccount')}{' '}
+          <Link to="/login" className="text-primary-600 hover:underline">
+            {t('auth.loginLink')}
+          </Link>
         </p>
-      </div>
+      </Card>
     </div>
   );
 };
 
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: 'calc(100vh - 200px)',
-    padding: '2rem',
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    padding: '2rem',
-    width: '100%',
-    maxWidth: '400px',
-  },
-  title: {
-    fontSize: '2rem',
-    marginBottom: '1.5rem',
-    textAlign: 'center',
-    color: '#2c3e50',
-  },
-  error: {
-    backgroundColor: '#fee',
-    color: '#c33',
-    padding: '0.75rem',
-    borderRadius: '4px',
-    marginBottom: '1rem',
-    fontSize: '0.9rem',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-  },
-  formGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem',
-  },
-  label: {
-    fontSize: '0.9rem',
-    fontWeight: '500',
-    color: '#333',
-  },
-  input: {
-    padding: '0.75rem',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    fontSize: '1rem',
-    transition: 'border-color 0.2s',
-  },
-  hint: {
-    fontSize: '0.8rem',
-    color: '#666',
-    marginTop: '-0.25rem',
-  },
-  submitBtn: {
-    backgroundColor: '#27ae60',
-    color: '#fff',
-    border: 'none',
-    padding: '0.75rem',
-    borderRadius: '4px',
-    fontSize: '1rem',
-    fontWeight: '500',
-    cursor: 'pointer',
-    marginTop: '0.5rem',
-    transition: 'background-color 0.2s',
-  },
-  footer: {
-    textAlign: 'center',
-    marginTop: '1.5rem',
-    fontSize: '0.9rem',
-    color: '#666',
-  },
-};
-
 export default Register;
-

@@ -1,36 +1,31 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
+import Button from '../UI/Button';
+import Spinner from '../UI/Spinner';
 
 const FilterPanel = ({ filters, onFiltersChange }) => {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch categories and tags (for now, we'll use empty arrays if API doesn't exist)
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Try to fetch categories - if endpoint doesn't exist, use empty array
         try {
           const catResponse = await api.get('/categories');
           if (catResponse.data.success) {
             setCategories(catResponse.data.data || []);
           }
-        } catch (err) {
-          // Categories endpoint doesn't exist yet - that's okay
-          console.log('Categories endpoint not available yet');
-        }
+        } catch (_) {}
 
-        // Try to fetch tags - if endpoint doesn't exist, use empty array
         try {
           const tagsResponse = await api.get('/tags');
           if (tagsResponse.data.success) {
             setTags(tagsResponse.data.data || []);
           }
-        } catch (err) {
-          // Tags endpoint doesn't exist yet - that's okay
-          console.log('Tags endpoint not available yet');
-        }
+        } catch (_) {}
       } catch (err) {
         console.error('Error fetching filter data:', err);
       } finally {
@@ -45,7 +40,7 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
     onFiltersChange({
       ...filters,
       category: filters.category === categoryId ? null : categoryId,
-      page: 1, // Reset to first page when filter changes
+      page: 1,
     });
   };
 
@@ -54,7 +49,7 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
     const newTags = currentTags.includes(tagId)
       ? currentTags.filter((id) => id !== tagId)
       : [...currentTags, tagId];
-    
+
     onFiltersChange({
       ...filters,
       tags: newTags.length > 0 ? newTags : null,
@@ -101,92 +96,109 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
     });
   };
 
+  const pricingLabels = {
+    free: t('filters.pricingFree'),
+    paid: t('filters.pricingPaid'),
+    freemium: t('filters.pricingFreemium'),
+  };
+
   if (loading) {
     return (
-      <div style={styles.panel}>
-        <p>Učitavanje filtera...</p>
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[var(--shadow-card)]">
+        <div className="flex items-center justify-center gap-2 text-slate-600">
+          <Spinner size="sm" />
+          <span>{t('filters.loading')}</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={styles.panel}>
-      <div style={styles.header}>
-        <h3 style={styles.title}>Filteri</h3>
-        <button onClick={clearFilters} style={styles.clearBtn}>
-          Resetiraj
-        </button>
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-[var(--shadow-card)]">
+      <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-4">
+        <h3 className="m-0 text-lg font-bold text-slate-800">{t('filters.title')}</h3>
+        <Button variant="danger" size="sm" onClick={clearFilters}>
+          {t('filters.reset')}
+        </Button>
       </div>
 
-      {/* Sortiranje */}
-      <div style={styles.section}>
-        <label style={styles.label}>Sortiranje</label>
+      <div className="mb-6">
+        <label className="mb-2 block text-sm font-semibold text-slate-700">
+          {t('filters.sort')}
+        </label>
         <select
           value={`${filters.sort || 'rating'}-${filters.order || 'desc'}`}
           onChange={(e) => handleSortChange(e.target.value)}
-          style={styles.select}
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
         >
-          <option value="rating-desc">Ocjena (najviša)</option>
-          <option value="rating-asc">Ocjena (najniža)</option>
-          <option value="name-asc">Naziv (A-Z)</option>
-          <option value="name-desc">Naziv (Z-A)</option>
-          <option value="newest-desc">Najnoviji</option>
-          <option value="oldest-asc">Najstariji</option>
+          <option value="rating-desc">{t('filters.sortRatingDesc')}</option>
+          <option value="rating-asc">{t('filters.sortRatingAsc')}</option>
+          <option value="name-asc">{t('filters.sortNameAsc')}</option>
+          <option value="name-desc">{t('filters.sortNameDesc')}</option>
+          <option value="newest-desc">{t('filters.sortNewest')}</option>
+          <option value="oldest-asc">{t('filters.sortOldest')}</option>
         </select>
       </div>
 
-      {/* Cijena */}
-      <div style={styles.section}>
-        <label style={styles.label}>Cijena</label>
-        <div style={styles.radioGroup}>
+      <div className="mb-6">
+        <label className="mb-2 block text-sm font-semibold text-slate-700">
+          {t('filters.price')}
+        </label>
+        <div className="flex flex-col gap-2">
           {['free', 'paid', 'freemium'].map((pricing) => (
-            <label key={pricing} style={styles.radioLabel}>
+            <label
+              key={pricing}
+              className="flex cursor-pointer items-center gap-2 text-sm"
+            >
               <input
                 type="radio"
                 name="pricing"
                 checked={filters.pricing === pricing}
                 onChange={() => handlePricingChange(pricing)}
-                style={styles.radio}
+                className="cursor-pointer"
               />
-              <span>
-                {pricing === 'free' && 'Besplatno'}
-                {pricing === 'paid' && 'Plaćeno'}
-                {pricing === 'freemium' && 'Freemium'}
-              </span>
+              <span>{pricingLabels[pricing]}</span>
             </label>
           ))}
         </div>
       </div>
 
-      {/* Minimalna ocjena */}
-      <div style={styles.section}>
-        <label style={styles.label}>Minimalna ocjena</label>
+      <div className="mb-6">
+        <label className="mb-2 block text-sm font-semibold text-slate-700">
+          {t('filters.minRating')}
+        </label>
         <select
-          value={filters.minRating || ''}
-          onChange={(e) => handleMinRatingChange(e.target.value ? Number(e.target.value) : null)}
-          style={styles.select}
+          value={filters.minRating ?? ''}
+          onChange={(e) =>
+            handleMinRatingChange(e.target.value ? Number(e.target.value) : null)
+          }
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
         >
-          <option value="">Sve ocjene</option>
-          <option value="1">1+ zvjezdica</option>
-          <option value="2">2+ zvjezdice</option>
-          <option value="3">3+ zvjezdice</option>
-          <option value="4">4+ zvjezdice</option>
-          <option value="4.5">4.5+ zvjezdica</option>
+          <option value="">{t('filters.allRatings')}</option>
+          <option value="1">{t('filters.stars1')}</option>
+          <option value="2">{t('filters.stars2')}</option>
+          <option value="3">{t('filters.stars3')}</option>
+          <option value="4">{t('filters.stars4')}</option>
+          <option value="4.5">{t('filters.stars45')}</option>
         </select>
       </div>
 
-      {/* Kategorije */}
       {categories.length > 0 && (
-        <div style={styles.section}>
-          <label style={styles.label}>Kategorije</label>
-          <div style={styles.checkboxGroup}>
+        <div className="mb-6">
+          <label className="mb-2 block text-sm font-semibold text-slate-700">
+            {t('filters.categories')}
+          </label>
+          <div className="max-h-[200px] flex flex-col gap-2 overflow-y-auto">
             {categories.map((category) => (
-              <label key={category._id} style={styles.checkboxLabel}>
+              <label
+                key={category._id}
+                className="flex cursor-pointer items-center gap-2 text-sm"
+              >
                 <input
                   type="checkbox"
                   checked={filters.category === category._id}
                   onChange={() => handleCategoryChange(category._id)}
-                  style={styles.checkbox}
+                  className="cursor-pointer"
                 />
                 <span>{category.name}</span>
               </label>
@@ -195,119 +207,36 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
         </div>
       )}
 
-      {/* Tagovi */}
       {tags.length > 0 && (
-        <div style={styles.section}>
-          <label style={styles.label}>Tagovi</label>
-          <div style={styles.checkboxGroup}>
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-slate-700">
+            {t('filters.tags')}
+          </label>
+          <div className="max-h-[200px] flex flex-col gap-2 overflow-y-auto">
             {tags.slice(0, 10).map((tag) => (
-              <label key={tag._id} style={styles.checkboxLabel}>
+              <label
+                key={tag._id}
+                className="flex cursor-pointer items-center gap-2 text-sm"
+              >
                 <input
                   type="checkbox"
                   checked={(filters.tags || []).includes(tag._id)}
                   onChange={() => handleTagToggle(tag._id)}
-                  style={styles.checkbox}
+                  className="cursor-pointer"
                 />
                 <span>{tag.name}</span>
               </label>
             ))}
             {tags.length > 10 && (
-              <p style={styles.moreInfo}>+{tags.length - 10} više tagova</p>
+              <p className="mt-2 text-xs italic text-slate-500">
+                {t('filters.moreTags', { count: tags.length - 10 })}
+              </p>
             )}
           </div>
         </div>
       )}
     </div>
   );
-};
-
-const styles = {
-  panel: {
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    padding: '1.5rem',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    marginBottom: '2rem',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '1.5rem',
-    paddingBottom: '1rem',
-    borderBottom: '2px solid #ecf0f1',
-  },
-  title: {
-    fontSize: '1.25rem',
-    fontWeight: 'bold',
-    margin: 0,
-    color: '#2c3e50',
-  },
-  clearBtn: {
-    padding: '0.5rem 1rem',
-    backgroundColor: '#e74c3c',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '0.85rem',
-  },
-  section: {
-    marginBottom: '1.5rem',
-  },
-  label: {
-    display: 'block',
-    fontSize: '0.9rem',
-    fontWeight: '600',
-    marginBottom: '0.75rem',
-    color: '#2c3e50',
-  },
-  select: {
-    width: '100%',
-    padding: '0.5rem',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    fontSize: '0.9rem',
-    outline: 'none',
-  },
-  radioGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem',
-  },
-  radioLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    cursor: 'pointer',
-    fontSize: '0.9rem',
-  },
-  radio: {
-    cursor: 'pointer',
-  },
-  checkboxGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem',
-    maxHeight: '200px',
-    overflowY: 'auto',
-  },
-  checkboxLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    cursor: 'pointer',
-    fontSize: '0.9rem',
-  },
-  checkbox: {
-    cursor: 'pointer',
-  },
-  moreInfo: {
-    fontSize: '0.8rem',
-    color: '#999',
-    fontStyle: 'italic',
-    marginTop: '0.5rem',
-  },
 };
 
 export default FilterPanel;

@@ -1,9 +1,20 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import useTool from '../hooks/useTool';
 import useWindowSize from '../hooks/useWindowSize';
+import Button from '../components/UI/Button';
+import Spinner from '../components/UI/Spinner';
+import { Card } from '../components/UI/Card';
+
+const pricingKeys = {
+  free: 'tool.free',
+  paid: 'tool.paid',
+  freemium: 'tool.freemium',
+};
 
 const ToolDetails = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -17,31 +28,32 @@ const ToolDetails = () => {
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
     return (
-      <div style={styles.rating}>
+      <div className="mb-4 flex items-center gap-1">
         {[...Array(fullStars)].map((_, i) => (
-          <span key={i} style={styles.star}>★</span>
+          <span key={i} className="text-amber-500 text-2xl">★</span>
         ))}
-        {hasHalfStar && <span style={styles.star}>☆</span>}
+        {hasHalfStar && <span className="text-amber-500 text-2xl">☆</span>}
         {[...Array(emptyStars)].map((_, i) => (
-          <span key={i} style={styles.emptyStar}>☆</span>
+          <span key={i} className="text-slate-300 text-2xl">☆</span>
         ))}
-        <span style={styles.ratingText}>
-          {rating > 0 ? rating.toFixed(1) : 'N/A'} ({tool?.reviewCount || 0} recenzija)
+        <span className="ml-2 text-slate-600">
+          {rating > 0 ? rating.toFixed(1) : t('tool.rating')} ({tool?.reviewCount || 0} {t('tool.reviews')})
         </span>
       </div>
     );
   };
 
   const getPricingBadge = (pricing) => {
-    const badges = {
-      free: { text: 'Besplatno', color: '#27ae60' },
-      paid: { text: 'Plaćeno', color: '#e74c3c' },
-      freemium: { text: 'Freemium', color: '#f39c12' },
+    const key = pricingKeys[pricing] ?? pricingKeys.free;
+    const colors = {
+      free: 'bg-accent-600',
+      paid: 'bg-red-600',
+      freemium: 'bg-amber-500',
     };
-    const badge = badges[pricing] || badges.free;
+    const color = colors[pricing] ?? colors.free;
     return (
-      <span style={{ ...styles.pricingBadge, backgroundColor: badge.color }}>
-        {badge.text}
+      <span className={`rounded-full px-4 py-2 text-sm font-semibold text-white ${color}`}>
+        {t(key)}
       </span>
     );
   };
@@ -51,374 +63,174 @@ const ToolDetails = () => {
       navigate('/login');
       return;
     }
-    // TODO: Implement watchlist functionality when Phase 5.2 is completed
-    alert('Funkcionalnost watchliste će biti implementirana u Fazi 5.2');
+    alert(t('tool.watchlistPlaceholder'));
   };
 
   if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.loading}>Učitavanje...</div>
+      <div className="container-app mx-auto max-w-4xl p-6 md:p-8">
+        <div className="flex items-center justify-center gap-2 py-16 text-slate-600">
+          <Spinner size="lg" />
+          <span>{t('common.loading')}</span>
+        </div>
       </div>
     );
   }
 
   if (error || !tool) {
     return (
-      <div style={styles.container}>
-        <div style={styles.error}>
-          <h2>Greška</h2>
-          <p>{error || 'Alat nije pronađen'}</p>
-          <Link to="/" style={styles.backLink}>
-            ← Povratak na početnu
+      <div className="container-app mx-auto max-w-4xl p-6 md:p-8">
+        <div className="rounded-lg bg-red-50 p-8 text-center text-red-700">
+          <h2 className="mb-2 text-xl font-semibold">{t('common.error')}</h2>
+          <p>{error || t('tool.notFound')}</p>
+          <Link
+            to="/"
+            className="mt-4 inline-block text-primary-600 no-underline hover:underline"
+          >
+            ← {t('tool.backToHome')}
           </Link>
         </div>
       </div>
     );
   }
 
-  const responsiveStyles = getResponsiveStyles(isMobile);
-
   return (
-    <div style={{ ...styles.container, ...responsiveStyles.container }}>
-      {/* Back Button */}
-      <button onClick={() => navigate(-1)} style={styles.backButton}>
-        ← Natrag
-      </button>
+    <div className={`container-app mx-auto max-w-4xl p-6 md:p-8 ${isMobile ? 'px-4' : ''}`}>
+      <Button
+        variant="secondary"
+        onClick={() => navigate(-1)}
+        className="mb-6"
+      >
+        ← {t('common.back')}
+      </Button>
 
-      {/* Main Content */}
-      <div style={{ ...styles.content, ...responsiveStyles.content }}>
-        {/* Header Section */}
-        <div style={styles.header}>
-          {tool.logo && (
-            <div style={styles.logoContainer}>
-              <img src={tool.logo} alt={tool.name} style={styles.logo} />
-            </div>
-          )}
-          <div style={styles.headerInfo}>
-            <h1 style={styles.title}>{tool.name}</h1>
-            {tool.category && (
-              <Link
-                to={`/?category=${tool.category.slug || tool.category._id}`}
-                style={styles.categoryLink}
-              >
-                {tool.category.name}
-              </Link>
+      <Card padding={false} className="overflow-hidden">
+        <div className="p-6 md:p-8">
+          <div className="mb-8 flex flex-col gap-6 border-b border-slate-200 pb-8 md:flex-row md:gap-8">
+            {tool.logo && (
+              <div className="flex h-28 w-28 shrink-0 overflow-hidden rounded-xl bg-slate-100 md:h-32 md:w-32">
+                <img src={tool.logo} alt={tool.name} className="h-full w-full object-cover" />
+              </div>
             )}
-            {renderStars(tool.rating || 0)}
-            <div style={styles.badges}>
-              {getPricingBadge(tool.pricing)}
+            <div className="flex-1">
+              <h1 className="mb-2 text-2xl font-bold text-slate-800">{tool.name}</h1>
+              {tool.category && (
+                <Link
+                  to={`/?category=${tool.category.slug || tool.category._id}`}
+                  className="mb-4 block text-primary-600 no-underline hover:underline"
+                >
+                  {tool.category.name}
+                </Link>
+              )}
+              {renderStars(tool.rating || 0)}
+              <div className="mt-2 flex gap-2">{getPricingBadge(tool.pricing)}</div>
             </div>
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div style={styles.actions}>
-          {tool.website && (
-            <a
-              href={tool.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={styles.websiteButton}
-            >
-              🌐 Posjeti web stranicu
-            </a>
+          <div className="mb-8 flex flex-wrap gap-4">
+            {tool.website && (
+              <a
+                href={tool.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-6 py-3 font-semibold text-white no-underline transition-colors hover:bg-primary-700"
+              >
+                🌐 {t('tool.visitWebsite')}
+              </a>
+            )}
+            <Button variant="secondary" onClick={handleAddToWatchlist} className="bg-amber-500 hover:bg-amber-600">
+              {isAuthenticated ? `⭐ ${t('tool.addToWatchlist')}` : `🔒 ${t('tool.loginForWatchlist')}`}
+            </Button>
+          </div>
+
+          <section className="mb-8 border-b border-slate-200 pb-8">
+            <h2 className="mb-4 text-xl font-bold text-slate-800">{t('tool.description')}</h2>
+            <p className="whitespace-pre-wrap leading-relaxed text-slate-600">{tool.description}</p>
+          </section>
+
+          {tool.models && tool.models.length > 0 && (
+            <section className="mb-8 border-b border-slate-200 pb-8">
+              <h2 className="mb-4 text-xl font-bold text-slate-800">{t('tool.aiModels')}</h2>
+              <div className="flex flex-wrap gap-3">
+                {tool.models.map((model) => (
+                  <span
+                    key={model._id || model}
+                    className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-700"
+                  >
+                    {model.name || model}
+                  </span>
+                ))}
+              </div>
+            </section>
           )}
-          <button
-            onClick={handleAddToWatchlist}
-            style={styles.watchlistButton}
-          >
-            {isAuthenticated ? '⭐ Dodaj u watchlistu' : '🔒 Prijavi se za watchlistu'}
-          </button>
+
+          {tool.tags && tool.tags.length > 0 && (
+            <section className="mb-8 border-b border-slate-200 pb-8">
+              <h2 className="mb-4 text-xl font-bold text-slate-800">{t('tool.tags')}</h2>
+              <div className="flex flex-wrap gap-3">
+                {tool.tags.map((tag) => (
+                  <span
+                    key={tag._id || tag}
+                    className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-700"
+                  >
+                    {tag.name || tag}
+                  </span>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {tool.metadata &&
+            (tool.metadata.githubUrl ||
+              tool.metadata.huggingFaceUrl ||
+              tool.metadata.apiDocumentation) && (
+              <section className="mb-8 border-b border-slate-200 pb-8">
+                <h2 className="mb-4 text-xl font-bold text-slate-800">
+                  {t('tool.additionalResources')}
+                </h2>
+                <div className="flex flex-wrap gap-4">
+                  {tool.metadata.githubUrl && (
+                    <a
+                      href={tool.metadata.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 font-medium text-slate-800 no-underline transition-colors hover:bg-slate-200"
+                    >
+                      📦 GitHub
+                    </a>
+                  )}
+                  {tool.metadata.huggingFaceUrl && (
+                    <a
+                      href={tool.metadata.huggingFaceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 font-medium text-slate-800 no-underline transition-colors hover:bg-slate-200"
+                    >
+                      🤗 Hugging Face
+                    </a>
+                  )}
+                  {tool.metadata.apiDocumentation && (
+                    <a
+                      href={tool.metadata.apiDocumentation}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 font-medium text-slate-800 no-underline transition-colors hover:bg-slate-200"
+                    >
+                      📚 API
+                    </a>
+                  )}
+                </div>
+              </section>
+            )}
+
+          <section>
+            <h2 className="mb-4 text-xl font-bold text-slate-800">{t('tool.reviewsSection')}</h2>
+            <p className="italic text-slate-500">{t('tool.reviewsPlaceholder')}</p>
+          </section>
         </div>
-
-        {/* Description */}
-        <div style={styles.section}>
-          <h2 style={styles.sectionTitle}>Opis</h2>
-          <p style={styles.description}>{tool.description}</p>
-        </div>
-
-        {/* AI Models */}
-        {tool.models && tool.models.length > 0 && (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>AI Modeli</h2>
-            <div style={styles.tags}>
-              {tool.models.map((model) => (
-                <span key={model._id || model} style={styles.tag}>
-                  {model.name || model}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Tags */}
-        {tool.tags && tool.tags.length > 0 && (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>Tagovi</h2>
-            <div style={styles.tags}>
-              {tool.tags.map((tag) => (
-                <span key={tag._id || tag} style={styles.tag}>
-                  {tag.name || tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* External Links */}
-        {tool.metadata && (tool.metadata.githubUrl || tool.metadata.huggingFaceUrl || tool.metadata.apiDocumentation) && (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>Dodatni resursi</h2>
-            <div style={styles.externalLinks}>
-              {tool.metadata.githubUrl && (
-                <a
-                  href={tool.metadata.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={styles.externalLink}
-                >
-                  📦 GitHub
-                </a>
-              )}
-              {tool.metadata.huggingFaceUrl && (
-                <a
-                  href={tool.metadata.huggingFaceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={styles.externalLink}
-                >
-                  🤗 Hugging Face
-                </a>
-              )}
-              {tool.metadata.apiDocumentation && (
-                <a
-                  href={tool.metadata.apiDocumentation}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={styles.externalLink}
-                >
-                  📚 API Dokumentacija
-                </a>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Reviews Section Placeholder */}
-        <div style={styles.section}>
-          <h2 style={styles.sectionTitle}>Recenzije</h2>
-          <p style={styles.placeholderText}>
-            Sekcija recenzija će biti implementirana u Fazi 11.2
-          </p>
-        </div>
-      </div>
+      </Card>
     </div>
   );
-};
-
-const getResponsiveStyles = (isMobile) => {
-  if (isMobile) {
-    return {
-      container: {
-        padding: '1rem',
-      },
-      content: {
-        padding: '1rem',
-      },
-    };
-  }
-  return {};
-};
-
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '2rem',
-  },
-  loading: {
-    textAlign: 'center',
-    padding: '3rem',
-    fontSize: '1.2rem',
-    color: '#666',
-  },
-  error: {
-    textAlign: 'center',
-    padding: '3rem',
-    color: '#e74c3c',
-  },
-  backButton: {
-    backgroundColor: '#bdc3c7',
-    color: '#2c3e50',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '0.9rem',
-    fontWeight: '500',
-    marginBottom: '1.5rem',
-    padding: '0.75rem 1.5rem',
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    transition: 'background-color 0.2s ease',
-  },
-  backLink: {
-    color: '#3498db',
-    textDecoration: 'none',
-    display: 'inline-block',
-    marginTop: '1rem',
-  },
-  content: {
-    backgroundColor: '#fff',
-    borderRadius: '12px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-    padding: '2rem',
-  },
-  header: {
-    display: 'flex',
-    gap: '2rem',
-    marginBottom: '2rem',
-    paddingBottom: '2rem',
-    borderBottom: '1px solid #ecf0f1',
-  },
-  logoContainer: {
-    width: '120px',
-    height: '120px',
-    borderRadius: '12px',
-    overflow: 'hidden',
-    backgroundColor: '#f5f5f5',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  logo: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  },
-  headerInfo: {
-    flex: 1,
-  },
-  title: {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    margin: '0 0 0.5rem 0',
-    color: '#2c3e50',
-  },
-  categoryLink: {
-    color: '#3498db',
-    textDecoration: 'none',
-    fontSize: '1rem',
-    display: 'inline-block',
-    marginBottom: '1rem',
-  },
-  rating: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.25rem',
-    marginBottom: '1rem',
-  },
-  star: {
-    color: '#f39c12',
-    fontSize: '1.5rem',
-  },
-  emptyStar: {
-    color: '#ddd',
-    fontSize: '1.5rem',
-  },
-  ratingText: {
-    marginLeft: '0.5rem',
-    fontSize: '1rem',
-    color: '#666',
-  },
-  badges: {
-    display: 'flex',
-    gap: '0.5rem',
-    marginTop: '0.5rem',
-  },
-  pricingBadge: {
-    padding: '0.5rem 1rem',
-    borderRadius: '20px',
-    fontSize: '0.9rem',
-    fontWeight: '600',
-    color: '#fff',
-  },
-  actions: {
-    display: 'flex',
-    gap: '1rem',
-    marginBottom: '2rem',
-    flexWrap: 'wrap',
-  },
-  websiteButton: {
-    padding: '0.75rem 1.5rem',
-    backgroundColor: '#3498db',
-    color: '#fff',
-    textDecoration: 'none',
-    borderRadius: '8px',
-    fontWeight: '600',
-    display: 'inline-block',
-    transition: 'background-color 0.2s',
-  },
-  watchlistButton: {
-    padding: '0.75rem 1.5rem',
-    backgroundColor: '#f39c12',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '8px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-  },
-  section: {
-    marginBottom: '2rem',
-    paddingBottom: '2rem',
-    borderBottom: '1px solid #ecf0f1',
-  },
-  sectionTitle: {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    margin: '0 0 1rem 0',
-    color: '#2c3e50',
-  },
-  description: {
-    fontSize: '1rem',
-    lineHeight: '1.8',
-    color: '#555',
-    whiteSpace: 'pre-wrap',
-  },
-  tags: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '0.75rem',
-  },
-  tag: {
-    padding: '0.5rem 1rem',
-    backgroundColor: '#ecf0f1',
-    borderRadius: '20px',
-    fontSize: '0.9rem',
-    color: '#555',
-  },
-  externalLinks: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '1rem',
-  },
-  externalLink: {
-    padding: '0.75rem 1.5rem',
-    backgroundColor: '#ecf0f1',
-    color: '#2c3e50',
-    textDecoration: 'none',
-    borderRadius: '8px',
-    fontWeight: '500',
-    display: 'inline-block',
-    transition: 'background-color 0.2s',
-  },
-  placeholderText: {
-    color: '#999',
-    fontStyle: 'italic',
-  },
 };
 
 export default ToolDetails;

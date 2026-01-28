@@ -5,7 +5,7 @@ Web aplikacija koja služi kao centralizirani katalog, pretraživač i sustav za
 ## Tehnologije
 
 - **Backend**: Node.js v25.2.1, Express v5.2.1
-- **Frontend**: React v19.2, Vite
+- **Frontend**: React v19.2, Vite, Tailwind CSS v4, react-i18next (i18n)
 - **Baza podataka**: MongoDB v8.2
 - **Autentifikacija**: JWT
 - **Vanjski API-ji**: Hugging Face API, RapidAPI
@@ -84,6 +84,9 @@ Frontend aplikacija će biti dostupna na `http://localhost:3000`
 - ✅ Admin panel za upravljanje katalogom
 - ✅ Integracija s vanjskim API-jima (Hugging Face, RapidAPI)
 - ✅ Autentifikacija i autorizacija
+- ✅ Reusable UI komponente (Button, Input, Card, Modal, Spinner, Skeleton, Toast)
+- ✅ Toast obavijesti (success/error/info/warning)
+- ✅ Internacionalizacija (i18n): hrvatski (zadano) i engleski, prekidač jezika u headeru
 
 ## Autori
 

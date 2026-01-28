@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { Card } from '../components/UI/Card';
+import Input from '../components/UI/Input';
+import Button from '../components/UI/Button';
 
 const Login = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -20,138 +25,69 @@ const Login = () => {
     if (result.success) {
       navigate('/');
     } else {
-      setError(result.error || 'Greška pri prijavi');
+      setError(result.error || t('auth.loginError'));
     }
 
     setLoading(false);
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>Prijava</h1>
+    <div className="flex min-h-[calc(100vh-200px)] items-center justify-center p-8">
+      <Card className="w-full max-w-md">
+        <h1 className="mb-6 text-center text-2xl font-bold text-slate-800">
+          {t('auth.loginTitle')}
+        </h1>
 
-        {error && <div style={styles.error}>{error}</div>}
-
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.formGroup}>
-            <label htmlFor="email" style={styles.label}>
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={styles.input}
-              placeholder="unesite@email.com"
-            />
+        {error && (
+          <div
+            className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700"
+            role="alert"
+          >
+            {error}
           </div>
+        )}
 
-          <div style={styles.formGroup}>
-            <label htmlFor="password" style={styles.label}>
-              Lozinka
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={styles.input}
-              placeholder="Unesite lozinku"
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <Input
+            id="email"
+            label={t('auth.email')}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder={t('auth.emailPlaceholder')}
+          />
 
-          <button
+          <Input
+            id="password"
+            label={t('auth.password')}
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            placeholder={t('auth.passwordPlaceholder')}
+          />
+
+          <Button
             type="submit"
             disabled={loading}
-            style={styles.submitBtn}
+            loading={loading}
+            fullWidth
+            className="mt-2"
           >
-            {loading ? 'Prijava...' : 'Prijavi se'}
-          </button>
+            {loading ? t('auth.loginLoading') : t('auth.loginButton')}
+          </Button>
         </form>
 
-        <p style={styles.footer}>
-          Nemate račun? <Link to="/register">Registrirajte se</Link>
+        <p className="mt-6 text-center text-sm text-slate-600">
+          {t('auth.noAccount')}{' '}
+          <Link to="/register" className="text-primary-600 hover:underline">
+            {t('auth.registerLink')}
+          </Link>
         </p>
-      </div>
+      </Card>
     </div>
   );
 };
 
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: 'calc(100vh - 200px)',
-    padding: '2rem',
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    padding: '2rem',
-    width: '100%',
-    maxWidth: '400px',
-  },
-  title: {
-    fontSize: '2rem',
-    marginBottom: '1.5rem',
-    textAlign: 'center',
-    color: '#2c3e50',
-  },
-  error: {
-    backgroundColor: '#fee',
-    color: '#c33',
-    padding: '0.75rem',
-    borderRadius: '4px',
-    marginBottom: '1rem',
-    fontSize: '0.9rem',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-  },
-  formGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem',
-  },
-  label: {
-    fontSize: '0.9rem',
-    fontWeight: '500',
-    color: '#333',
-  },
-  input: {
-    padding: '0.75rem',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    fontSize: '1rem',
-    transition: 'border-color 0.2s',
-  },
-  submitBtn: {
-    backgroundColor: '#3498db',
-    color: '#fff',
-    border: 'none',
-    padding: '0.75rem',
-    borderRadius: '4px',
-    fontSize: '1rem',
-    fontWeight: '500',
-    cursor: 'pointer',
-    marginTop: '0.5rem',
-    transition: 'background-color 0.2s',
-  },
-  footer: {
-    textAlign: 'center',
-    marginTop: '1.5rem',
-    fontSize: '0.9rem',
-    color: '#666',
-  },
-};
-
 export default Login;
-

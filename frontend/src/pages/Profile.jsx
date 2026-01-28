@@ -1,79 +1,46 @@
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { Card } from '../components/UI/Card';
+import Spinner from '../components/UI/Spinner';
 
 const Profile = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   if (!user) {
     return (
-      <div style={styles.container}>
-        <p>Učitavanje...</p>
+      <div className="mx-auto max-w-4xl p-8">
+        <div className="flex items-center justify-center gap-2 text-slate-600">
+          <Spinner size="md" />
+          <span>{t('common.loading')}</span>
+        </div>
       </div>
     );
   }
 
+  const roleLabel = user.role === 'admin' ? t('profile.roleAdmin') : t('profile.roleUser');
+
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>Korisnički Profil</h1>
-        <div style={styles.info}>
-          <div style={styles.infoRow}>
-            <span style={styles.label}>Korisničko ime:</span>
-            <span style={styles.value}>{user.username}</span>
+    <div className="mx-auto max-w-4xl p-8">
+      <Card className="mx-auto max-w-xl">
+        <h1 className="mb-8 text-2xl font-bold text-slate-800">{t('profile.title')}</h1>
+        <div className="flex flex-col gap-6">
+          <div className="flex justify-between border-b border-slate-200 pb-4">
+            <span className="font-medium text-slate-600">{t('profile.username')}</span>
+            <span className="text-slate-800">{user.username}</span>
           </div>
-          <div style={styles.infoRow}>
-            <span style={styles.label}>Email:</span>
-            <span style={styles.value}>{user.email}</span>
+          <div className="flex justify-between border-b border-slate-200 pb-4">
+            <span className="font-medium text-slate-600">{t('profile.email')}</span>
+            <span className="text-slate-800">{user.email}</span>
           </div>
-          <div style={styles.infoRow}>
-            <span style={styles.label}>Uloga:</span>
-            <span style={styles.value}>
-              {user.role === 'admin' ? 'Administrator' : 'Korisnik'}
-            </span>
+          <div className="flex justify-between border-b border-slate-200 pb-4">
+            <span className="font-medium text-slate-600">{t('profile.role')}</span>
+            <span className="text-slate-800">{roleLabel}</span>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
 
-const styles = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '2rem',
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    padding: '2rem',
-    maxWidth: '600px',
-    margin: '0 auto',
-  },
-  title: {
-    fontSize: '2rem',
-    marginBottom: '2rem',
-    color: '#2c3e50',
-  },
-  info: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.5rem',
-  },
-  infoRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    paddingBottom: '1rem',
-    borderBottom: '1px solid #eee',
-  },
-  label: {
-    fontWeight: '500',
-    color: '#666',
-  },
-  value: {
-    color: '#333',
-  },
-};
-
 export default Profile;
-
