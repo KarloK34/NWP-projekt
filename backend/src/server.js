@@ -30,6 +30,11 @@ app.get('/api/health', (req, res) => {
 // API routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tools', require('./routes/tools'));
+app.use('/api/reviews', require('./routes/reviews'));
+app.use('/api/watchlist', require('./routes/watchlist'));
+app.use('/api/categories', require('./routes/categories'));
+app.use('/api/tags', require('./routes/tags'));
+app.use('/api/models', require('./routes/models'));
 
 // Error handling middleware (must be after all routes)
 const { errorHandler } = require('./middleware/errorHandler');
