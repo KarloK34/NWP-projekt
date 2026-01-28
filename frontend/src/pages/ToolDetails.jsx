@@ -6,6 +6,7 @@ import useWindowSize from '../hooks/useWindowSize';
 import Button from '../components/UI/Button';
 import Spinner from '../components/UI/Spinner';
 import { Card } from '../components/UI/Card';
+import ReviewsList from '../components/Review/ReviewsList';
 
 const pricingKeys = {
   free: 'tool.free',
@@ -18,7 +19,7 @@ const ToolDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { tool, loading, error } = useTool(id);
+  const { tool, loading, error, refetch: refetchTool } = useTool(id);
   const { width } = useWindowSize();
   const isMobile = width < 768;
 
@@ -223,9 +224,8 @@ const ToolDetails = () => {
               </section>
             )}
 
-          <section>
-            <h2 className="mb-4 text-xl font-bold text-slate-800 dark:text-slate-100">{t('tool.reviewsSection')}</h2>
-            <p className="italic text-slate-500 dark:text-slate-400">{t('tool.reviewsPlaceholder')}</p>
+          <section className="border-t border-slate-200 pt-8 dark:border-slate-700">
+            <ReviewsList toolId={id} onReviewChange={refetchTool} />
           </section>
         </div>
       </Card>
