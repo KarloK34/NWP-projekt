@@ -5,10 +5,10 @@ const modelsController = require('../controllers/modelsController');
 
 const router = express.Router();
 
-router.get('/models', modelsController.getModels);
+router.get('/', modelsController.getModels);
 
 router.post(
-  '/models',
+  '/',
   authenticate,
   authorizeAdmin,
   [

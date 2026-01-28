@@ -29,7 +29,7 @@ router.post(
 
 // PUT /api/reviews/:id (auth)
 router.put(
-  '/reviews/:id',
+  '/:id',
   authenticate,
   [
     body('rating')
@@ -48,6 +48,6 @@ router.put(
 );
 
 // DELETE /api/reviews/:id (auth)
-router.delete('/reviews/:id', authenticate, reviewsController.deleteReview);
+router.delete('/:id', authenticate, reviewsController.deleteReview);
 
 module.exports = router;

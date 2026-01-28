@@ -5,10 +5,10 @@ const categoriesController = require('../controllers/categoriesController');
 
 const router = express.Router();
 
-router.get('/categories', categoriesController.getCategories);
+router.get('/', categoriesController.getCategories);
 
 router.post(
-  '/categories',
+  '/',
   authenticate,
   authorizeAdmin,
   [

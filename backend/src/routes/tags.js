@@ -5,10 +5,10 @@ const tagsController = require('../controllers/tagsController');
 
 const router = express.Router();
 
-router.get('/tags', tagsController.getTags);
+router.get('/', tagsController.getTags);
 
 router.post(
-  '/tags',
+  '/',
   authenticate,
   authorizeAdmin,
   [
