@@ -6,7 +6,7 @@ const modelsController = require('../controllers/modelsController');
 const router = express.Router();
 
 router.get('/', modelsController.getModels);
-
+router.get('/hf/search', modelsController.hfSearchModels);
 router.post(
   '/',
   authenticate,

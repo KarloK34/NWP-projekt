@@ -1,4 +1,7 @@
 const axios = require('axios');
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 60 * 10 }); // 10 min
+
 
 const HF_BASE = 'https://huggingface.co/api';
 
@@ -28,11 +31,18 @@ async function getModelDetails(modelId) {
   }
 
   try {
+    const key = `hf:model:${modelId}`;
+    const cached = cache.get(key);
+    if (cached) return cached;
+
     const { data } = await axios.get(`${HF_BASE}/models/${encodeURIComponent(modelId)}`, {
       headers: hfHeaders(),
       timeout: 10000,
     });
-    return mapHfDetails(data);
+    const mapped = mapHfDetails(data);
+    cache.set(key, mapped);
+    return mapped;
+
   } catch (e) {
     // HuggingFace vraća 404 za nepostojeći model
     if (e.response?.status === 404) {
@@ -51,6 +61,11 @@ async function getModelDetails(modelId) {
       err.statusCode = 429;
       throw err;
     }
+    if (e.response?.status === 400) {
+    const err = new Error('Hugging Face: Bad request (provjeri huggingFaceModelId)');
+    err.statusCode = 400;
+    throw err;
+    }
     throw e;
   }
 }
@@ -58,9 +73,20 @@ async function getModelDetails(modelId) {
 // Pretraživanje modela po tasku/pipeline_tag
 // HF endpoint: GET /api/models?pipeline_tag=text-generation&limit=10
 async function searchModelsByTask(taskType, limit = 10) {
+  if (!taskType || typeof taskType !== 'string' || !taskType.trim()) {
+  const err = new Error('Invalid taskType');
+  err.statusCode = 400;
+  throw err;
+ }
+taskType = taskType.trim();
+
   const safeLimit = Math.min(Math.max(parseInt(limit, 10) || 10, 1), 50);
 
   try {
+    const key = `hf:task:${taskType}:${safeLimit}`;
+    const cached = cache.get(key);
+    if (cached) return cached;
+
     const { data } = await axios.get(`${HF_BASE}/models`, {
       params: {
         pipeline_tag: taskType,
@@ -70,13 +96,17 @@ async function searchModelsByTask(taskType, limit = 10) {
       timeout: 10000,
     });
 
-    return (data || []).map((m) => ({
-      modelId: m.modelId,
-      downloads: m.downloads ?? 0,
-      likes: m.likes ?? 0,
-      taskType: m.pipeline_tag || null,
-      lastModified: m.lastModified || null,
+    const mapped = (data || []).map((m) => ({
+        modelId: m.modelId,
+        downloads: m.downloads ?? 0,
+        likes: m.likes ?? 0,
+        taskType: m.pipeline_tag || null,
+        lastModified: m.lastModified || null,
     }));
+
+    cache.set(key, mapped);
+    return mapped;
+
   } catch (e) {
     if (e.response?.status === 429) {
       const err = new Error('Hugging Face: rate limit exceeded');
