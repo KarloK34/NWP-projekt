@@ -244,7 +244,7 @@ const ToolDetails = () => {
               </section>
             )}
 
-          <section className="border-t border-slate-200 pt-8 dark:border-slate-700">
+          <section className="pt-8">
             <ReviewsList toolId={id} onReviewChange={refetchTool} />
           </section>
         </div>

@@ -161,7 +161,104 @@
   },
   "admin": {
     "title": "Admin Panel",
-    "comingSoon": "Admin funkcionalnosti će biti implementirane u Fazi 12"
+    "comingSoon": "Admin funkcionalnosti će biti implementirane u Fazi 12",
+    "openMenu": "Otvori izbornik",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "tools": "Alati",
+      "categories": "Kategorije",
+      "tags": "Tagovi",
+      "models": "Modeli",
+      "users": "Korisnici"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "totalTools": "Ukupno alata",
+      "totalUsers": "Ukupno korisnika",
+      "totalReviews": "Ukupno recenzija",
+      "avgRating": "Prosječna ocjena",
+      "topCategories": "Top kategorije"
+    },
+    "tools": {
+      "title": "Upravljanje alatima",
+      "addTool": "Dodaj alat",
+      "edit": "Uredi",
+      "delete": "Obriši",
+      "deleteConfirmTitle": "Obrisati alat?",
+      "deleteConfirmMessage": "Jeste li sigurni da želite obrisati ovaj alat? Ova radnja je nepovratna.",
+      "noTools": "Nema alata.",
+      "name": "Naziv",
+      "category": "Kategorija",
+      "pricing": "Cijena",
+      "rating": "Ocjena",
+      "actions": "Akcije"
+    },
+    "toolForm": {
+      "newTool": "Novi alat",
+      "editTool": "Uredi alat",
+      "name": "Naziv",
+      "description": "Opis",
+      "website": "Web stranica (URL)",
+      "logo": "Logo (URL)",
+      "category": "Kategorija",
+      "tags": "Tagovi",
+      "models": "Modeli",
+      "pricing": "Cijena",
+      "metadata": "Metapodaci",
+      "githubUrl": "GitHub URL",
+      "huggingFaceUrl": "Hugging Face URL",
+      "apiDocumentation": "API dokumentacija",
+      "enrich": "Obogati iz vanjskih API-ja"
+    },
+    "categories": {
+      "title": "Upravljanje kategorijama",
+      "add": "Dodaj kategoriju",
+      "edit": "Uredi",
+      "delete": "Obriši",
+      "name": "Naziv",
+      "description": "Opis",
+      "deleteConfirmTitle": "Obrisati kategoriju?",
+      "deleteConfirmMessage": "Jeste li sigurni? Kategorija se ne može obrisati ako se koristi u alatima."
+    },
+    "tags": {
+      "title": "Upravljanje tagovima",
+      "add": "Dodaj tag",
+      "edit": "Uredi",
+      "delete": "Obriši",
+      "removeAndDelete": "Ukloni sa svih alata i obriši",
+      "name": "Naziv",
+      "type": "Tip",
+      "deleteConfirmTitle": "Ukloniti tag sa svih alata i obrisati?",
+      "deleteConfirmMessage": "Tag će biti uklonjen sa svih alata na kojima se nalazi i obrisan iz baze. Jeste li sigurni?"
+    },
+    "models": {
+      "title": "Upravljanje modelima",
+      "add": "Dodaj model",
+      "edit": "Uredi",
+      "delete": "Obriši",
+      "name": "Naziv",
+      "provider": "Provider",
+      "version": "Verzija",
+      "source": "Izvor",
+      "huggingFaceModelId": "Hugging Face Model ID",
+      "deleteConfirmTitle": "Obrisati model?",
+      "deleteConfirmMessage": "Jeste li sigurni? Model se ne može obrisati ako se koristi u alatima."
+    },
+    "users": {
+      "title": "Upravljanje korisnicima",
+      "username": "Korisničko ime",
+      "email": "Email",
+      "role": "Uloga",
+      "createdAt": "Registriran",
+      "setAdmin": "Postavi admin",
+      "setUser": "Postavi korisnik",
+      "noUsers": "Nema korisnika.",
+      "cannotChangeOwnRole": "Ne možete promijeniti vlastitu ulogu."
+    },
+    "deleteConfirm": "Jeste li sigurni?",
+    "saved": "Spremljeno.",
+    "deleted": "Obrisano.",
+    "error": "Greška."
   },
   "footer": {
     "copyright": "© 2025 AI Tools Catalog. Sva prava pridržana.",

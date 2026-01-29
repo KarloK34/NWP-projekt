@@ -15,12 +15,6 @@ const tagSchema = new mongoose.Schema(
       enum: ['price', 'feature', 'use-case', 'technology', 'other'],
       default: 'other',
     },
-    color: {
-      type: String,
-      trim: true,
-      // Hex color code (e.g., #FF5733)
-      match: [/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, 'Molimo unesite valjanu hex boju'],
-    },
   },
   {
     timestamps: true,

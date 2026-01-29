@@ -7,6 +7,7 @@ const {
   updateTool,
   deleteTool,
   getToolsStats,
+  enrichTool,
 } = require('../controllers/toolsController');
 const { authenticate, authorizeAdmin } = require('../middleware/auth');
 
@@ -47,20 +48,43 @@ const toolValidation = [
     .optional()
     .isArray()
     .withMessage('models mora biti array'),
-  body('isPublished')
+  body('logo')
+    .optional({ nullable: true })
+    .isString()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('logo predugačak'),
+  body('metadata')
     .optional()
-    .isBoolean()
-    .withMessage('isPublished mora biti boolean'),
+    .isObject()
+    .withMessage('metadata mora biti objekt'),
+  body('metadata.githubUrl')
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ max: 500 }),
+  body('metadata.huggingFaceUrl')
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ max: 500 }),
+  body('metadata.apiDocumentation')
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ max: 500 }),
 ];
 
 // Public
 router.get('/', getTools);
+// Admin – mora biti ispred GET /:id da /stats ne hvata getToolById
+router.get('/stats', authenticate, authorizeAdmin, getToolsStats);
 router.get('/:id', getToolById);
 
 // Admin
-router.get('/stats', authenticate, authorizeAdmin, getToolsStats);
 router.post('/', authenticate, authorizeAdmin, toolValidation, createTool);
 router.put('/:id', authenticate, authorizeAdmin, toolValidation, updateTool);
 router.delete('/:id', authenticate, authorizeAdmin, deleteTool);
+router.post('/:id/enrich', authenticate, authorizeAdmin, enrichTool);
 
 module.exports = router;

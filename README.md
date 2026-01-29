@@ -83,6 +83,10 @@ Frontend aplikacija će biti dostupna na `http://localhost:3000`
 - ✅ Watchlist funkcionalnost (stranica Watchlist, dodavanje/uklanjanje na stranici alata)
 - ✅ Korisnički profil: osnovni podaci, moje recenzije, pregled watchliste
 - ✅ Admin panel za upravljanje katalogom
+  ✅ Dashboard sa statistikama (broj alata, korisnika, recenzija, prosječna ocjena, top kategorije)
+  ✅ Upravljanje alatima: lista, dodavanje, uređivanje, brisanje (s potvrdom), polje za logo i metapodatke, gumb „Obogati iz vanjskih API-ja“
+  ✅ CRUD za kategorije, tagove i modele
+  ✅ Upravljanje korisnicima: lista, promjena uloge (user ↔ admin), paginacija i pretraga
 - ✅ Integracija s vanjskim API-jima (Hugging Face, RapidAPI)
 - ✅ Autentifikacija i autorizacija
 - ✅ Reusable UI komponente (Button, Input, Card, Modal, Spinner, Skeleton, Toast)
