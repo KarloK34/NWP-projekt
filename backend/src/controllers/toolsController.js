@@ -40,19 +40,20 @@ const getSortObject = (sort, order) => {
       return { createdAt: 1 };
     case 'rating':
     default:
-      return { rating: -1, reviewCount: -1, createdAt: -1 };
+      return { rating: dir, reviewCount: dir, createdAt: dir };
   }
 };
 
 /**
  * GET /api/tools
  * Query params:
- * category, tags, pricing, minRating, search, page, limit, sort, order, models (bonus)
+ * category, categories (comma-separated), tags, pricing, minRating, search, page, limit, sort, order, models (bonus)
  */
 const getTools = async (req, res, next) => {
   try {
     const {
       category,
+      categories,
       tags,
       pricing,
       minRating,
@@ -68,15 +69,20 @@ const getTools = async (req, res, next) => {
 
     const filter = {};
 
-    // category može biti ObjectId ili slug
-    if (category) {
-      if (isObjectId(category)) {
-        filter.category = category;
-      } else {
-        const cat = await Category.findOne({ slug: category }).select('_id');
-        // ako nema takve kategorije -> nema rezultata
-        filter.category = cat ? cat._id : null;
+    // categories: više kategorija (comma-separated), ili category: jedna (backward compat)
+    const categoryList = parseCommaList(categories || category);
+    if (categoryList.length > 0) {
+      const ids = categoryList.filter(isObjectId);
+      const slugs = categoryList.filter((c) => !isObjectId(c));
+
+      let categoryIds = [...ids];
+
+      if (slugs.length > 0) {
+        const found = await Category.find({ slug: { $in: slugs } }).select('_id');
+        categoryIds = categoryIds.concat(found.map((c) => c._id));
       }
+
+      filter.category = categoryIds.length === 0 ? { $in: [] } : { $in: categoryIds };
     }
 
     // pricing
@@ -127,16 +133,23 @@ const getTools = async (req, res, next) => {
     const hasSearch = search && String(search).trim().length > 0;
 
     const sortObj = getSortObject(sort, order);
+    const sortByName = sort && String(sort).toLowerCase() === 'name';
 
     const findQuery = hasSearch
       ? { ...filter, name: { $regex: String(search).trim(), $options: 'i' } }
       : filter;
 
+    let query = Tool.find(findQuery)
+      .populate('category', 'name slug')
+      .populate('tags', 'name')
+      .populate('models', 'name');
+
+    if (sortByName) {
+      query = query.collation({ locale: 'en', strength: 2 });
+    }
+
     const [items, total] = await Promise.all([
-      Tool.find(findQuery)
-        .populate('category', 'name slug')
-        .populate('tags', 'name')
-        .populate('models', 'name')
+      query
         .sort(sort ? sortObj : (hasSearch ? { createdAt: -1 } : { rating: -1, reviewCount: -1, createdAt: -1 }))
         .skip(skip)
         .limit(limit)

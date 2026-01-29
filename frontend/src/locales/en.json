@@ -157,7 +157,8 @@
   "watchlist": {
     "title": "Watchlist",
     "empty": "You have no tools in your watchlist. Add tools from the tools page.",
-    "remove": "Remove"
+    "remove": "Remove",
+    "noMatch": "No tools match the selected categories."
   },
   "admin": {
     "title": "Admin Panel",

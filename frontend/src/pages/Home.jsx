@@ -38,6 +38,11 @@ const Home = () => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
   };
 
+  const handleSortChange = (value) => {
+    const [sortField, order] = value.split('-');
+    setFilters((prev) => ({ ...prev, sort: sortField, order: order || 'desc', page: 1 }));
+  };
+
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -47,14 +52,40 @@ const Home = () => {
 
   return (
     <div className="container-app w-full p-6 md:p-8">
-      <div className="mb-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
-          <SearchBar
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder={t('home.searchPlaceholder')}
-          />
-          {isMobile && (
+      {isMobile && (
+        <div className="mb-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
+            <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-center sm:gap-4">
+              <SearchBar
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder={t('home.searchPlaceholder')}
+              />
+              <div className="flex shrink-0 items-center gap-2">
+                <svg
+                  className="size-5 shrink-0 text-slate-500 dark:text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+                <select
+                  value={`${filters.sort || 'rating'}-${filters.order || 'desc'}`}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+                  aria-label={t('filters.sort')}
+                >
+                  <option value="rating-desc">{t('filters.sortRatingDesc')}</option>
+                  <option value="rating-asc">{t('filters.sortRatingAsc')}</option>
+                  <option value="name-asc">{t('filters.sortNameAsc')}</option>
+                  <option value="name-desc">{t('filters.sortNameDesc')}</option>
+                  <option value="newest-desc">{t('filters.sortNewest')}</option>
+                  <option value="oldest-asc">{t('filters.sortOldest')}</option>
+                </select>
+              </div>
+            </div>
             <Button
               variant="primary"
               onClick={() => setShowFilters(!showFilters)}
@@ -72,9 +103,9 @@ const Home = () => {
               </svg>
               {t('home.toggleFilters')}
             </Button>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       {isMobile && showFilters && (
         <div
@@ -109,12 +140,47 @@ const Home = () => {
 
       <div className="grid gap-8 lg:grid-cols-[280px_1fr] lg:items-start">
         {!isMobile && (
-          <aside className="sticky top-8 max-h-[calc(100vh-4rem)] overflow-y-auto">
+          <aside className="sticky top-8 max-h-[calc(100vh-4rem)] overflow-y-auto self-start">
             <FilterPanel filters={filters} onFiltersChange={handleFiltersChange} />
           </aside>
         )}
 
-        <main className="min-h-[400px]">
+        <div className="min-w-0">
+          {!isMobile && (
+            <div className="mb-8 flex flex-wrap items-center gap-4">
+              <SearchBar
+                value={searchQuery}
+                onChange={handleSearchChange}
+                placeholder={t('home.searchPlaceholder')}
+              />
+              <div className="flex shrink-0 items-center gap-2">
+                <svg
+                  className="size-5 shrink-0 text-slate-500 dark:text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+                <select
+                  value={`${filters.sort || 'rating'}-${filters.order || 'desc'}`}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+                  aria-label={t('filters.sort')}
+                >
+                  <option value="rating-desc">{t('filters.sortRatingDesc')}</option>
+                  <option value="rating-asc">{t('filters.sortRatingAsc')}</option>
+                  <option value="name-asc">{t('filters.sortNameAsc')}</option>
+                  <option value="name-desc">{t('filters.sortNameDesc')}</option>
+                  <option value="newest-desc">{t('filters.sortNewest')}</option>
+                  <option value="oldest-asc">{t('filters.sortOldest')}</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          <main className="min-h-[400px]">
           {loading && tools.length === 0 && (
             <div className="py-16 text-center">
               <SkeletonToolGrid count={6} />
@@ -177,6 +243,7 @@ const Home = () => {
             </>
           )}
         </main>
+        </div>
       </div>
     </div>
   );

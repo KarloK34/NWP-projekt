@@ -154,13 +154,25 @@ const ToolDetails = () => {
               onClick={handleWatchlistToggle}
               disabled={watchlistMutating}
               loading={watchlistMutating}
-              className={isInWatchlist ? 'bg-slate-500 hover:bg-slate-600' : 'bg-amber-500 hover:bg-amber-600'}
             >
-              {!isAuthenticated
-                ? `🔒 ${t('tool.loginForWatchlist')}`
-                : isInWatchlist
-                  ? `✓ ${t('tool.removeFromWatchlist')}`
-                  : `⭐ ${t('tool.addToWatchlist')}`}
+              {!isAuthenticated ? (
+                <>🔒 {t('tool.loginForWatchlist')}</>
+              ) : isInWatchlist ? (
+                <>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="size-5"
+                    aria-hidden
+                  >
+                    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-2.72 2.72a.75.75 0 101.06 1.06L10 11.06l2.72 2.72a.75.75 0 101.06-1.06L11.06 10l2.72-2.72a.75.75 0 00-1.06-1.06L10 8.94 7.28 6.22z" />
+                  </svg>
+                  {t('tool.removeFromWatchlist')}
+                </>
+              ) : (
+                <>⭐ {t('tool.addToWatchlist')}</>
+              )}
             </Button>
           </div>
 

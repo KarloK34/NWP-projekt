@@ -157,7 +157,8 @@
   "watchlist": {
     "title": "Watchlist",
     "empty": "Nemate alata u watchlisti. Dodajte alate s stranice alata.",
-    "remove": "Ukloni"
+    "remove": "Ukloni",
+    "noMatch": "Nijedan alat ne odgovara odabranim kategorijama."
   },
   "admin": {
     "title": "Admin Panel",

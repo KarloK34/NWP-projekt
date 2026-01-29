@@ -80,7 +80,7 @@ Frontend aplikacija će biti dostupna na `http://localhost:3000`
 
 - ✅ Pretraga i filtriranje AI alata
 - ✅ Recenzije i ocjene alata
-- ✅ Watchlist funkcionalnost (stranica Watchlist, dodavanje/uklanjanje na stranici alata)
+- ✅ Watchlist funkcionalnost (stranica Watchlist, dodavanje/uklanjanje na stranici alata, filtriranje po kategorijama)
 - ✅ Korisnički profil: osnovni podaci, moje recenzije, pregled watchliste
 - ✅ Admin panel za upravljanje katalogom
   ✅ Dashboard sa statistikama (broj alata, korisnika, recenzija, prosječna ocjena, top kategorije)
