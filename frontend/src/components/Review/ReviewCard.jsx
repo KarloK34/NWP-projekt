@@ -7,12 +7,14 @@ import Modal from '../UI/Modal';
 /**
  * Prikaz jedne recenzije: korisnik, ocjena, komentar, prednosti/nedostaci.
  * Ako je trenutni korisnik vlasnik, prikazuje gumbe Uredi i Obriši.
+ * Ako je isAdmin, prikazuje gumb Obriši za sve recenzije (admin može obrisati neprimjerene).
  */
 export default function ReviewCard({
   review,
   onEdit,
   onDelete,
   isDeleting = false,
+  isAdmin = false,
 }) {
   const { t } = useTranslation();
   const { user: currentUser } = useAuth();
@@ -21,6 +23,8 @@ export default function ReviewCard({
   const userId = typeof review.user === 'object' ? review.user?._id : review.user;
   const username = typeof review.user === 'object' ? review.user?.username : null;
   const isOwner = currentUser?.id === userId || currentUser?._id === userId;
+  const canDelete = isOwner || isAdmin;
+  const canEdit = isOwner && !isAdmin;
 
   const renderStars = (rating) => {
     const full = Math.floor(rating);
@@ -101,20 +105,24 @@ export default function ReviewCard({
         </div>
       )}
 
-      {isOwner && (
+      {(canEdit || canDelete) && (
         <div className="mt-3 flex gap-2 border-t border-slate-200 pt-3 dark:border-slate-700">
-          <Button variant="ghost" size="sm" onClick={() => onEdit(review)}>
-            {t('review.edit')}
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => setConfirmDeleteOpen(true)}
-            disabled={isDeleting}
-            loading={isDeleting}
-          >
-            {t('review.delete')}
-          </Button>
+          {canEdit && onEdit && (
+            <Button variant="ghost" size="sm" onClick={() => onEdit(review)}>
+              {t('review.edit')}
+            </Button>
+          )}
+          {canDelete && onDelete && (
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => setConfirmDeleteOpen(true)}
+              disabled={isDeleting}
+              loading={isDeleting}
+            >
+              {t('review.delete')}
+            </Button>
+          )}
         </div>
       )}
 
