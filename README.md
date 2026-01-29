@@ -8,7 +8,7 @@ Web aplikacija koja služi kao centralizirani katalog, pretraživač i sustav za
 - **Frontend**: React v19.2, Vite, Tailwind CSS v4, react-i18next (i18n)
 - **Baza podataka**: MongoDB v8.2
 - **Autentifikacija**: JWT
-- **Vanjski API-ji**: Hugging Face API, RapidAPI
+- **Vanjski API-ji**: Groq (AI opisi)
 
 ## Struktura Projekta
 
@@ -46,8 +46,8 @@ NODE_ENV=development
 MONGODB_URI=mongodb://localhost:27017/ai-tools-catalog
 JWT_SECRET=your-super-secret-jwt-key
 JWT_EXPIRE=7d
-HUGGINGFACE_API_KEY=your-huggingface-api-key-here
-RAPIDAPI_KEY=your-rapidapi-key-here
+# Za generiranje AI opisa alata (admin gumb "Generiraj AI opis"):
+GROQ_API_KEY=your-groq-key           # Besplatan, bez kartice (console.groq.com)
 ```
 
 4. Pokrenite server:
@@ -84,10 +84,10 @@ Frontend aplikacija će biti dostupna na `http://localhost:3000`
 - ✅ Korisnički profil: osnovni podaci, moje recenzije, pregled watchliste
 - ✅ Admin panel za upravljanje katalogom
   ✅ Dashboard sa statistikama (broj alata, korisnika, recenzija, prosječna ocjena, top kategorije)
-  ✅ Upravljanje alatima: lista, dodavanje, uređivanje, brisanje (s potvrdom), polje za logo i metapodatke, gumb „Obogati iz vanjskih API-ja“
+  ✅ Upravljanje alatima: lista, dodavanje, uređivanje, brisanje (s potvrdom), polje za logo i metapodatke, gumb „Generiraj AI opis“ (Groq)
   ✅ CRUD za kategorije, tagove i modele
   ✅ Upravljanje korisnicima: lista, promjena uloge (user ↔ admin), paginacija i pretraga
-- ✅ Integracija s vanjskim API-jima (Hugging Face, RapidAPI)
+- ✅ Integracija s vanjskim API-jima: Groq (generiranje AI opisa alata), Hugging Face, RapidAPI
 - ✅ Autentifikacija i autorizacija
 - ✅ Reusable UI komponente (Button, Input, Card, Modal, Spinner, Skeleton, Toast)
 - ✅ Toast obavijesti (success/error/info/warning)

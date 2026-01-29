@@ -212,7 +212,9 @@
       "githubUrl": "GitHub URL",
       "huggingFaceUrl": "Hugging Face URL",
       "apiDocumentation": "API dokumentacija",
-      "enrich": "Obogati iz vanjskih API-ja"
+      "enrich": "Obogati iz vanjskih API-ja",
+      "generateAiDescription": "Generiraj AI opis",
+      "enrichSuccess": "AI opis uspješno generiran"
     },
     "categories": {
       "title": "Upravljanje kategorijama",

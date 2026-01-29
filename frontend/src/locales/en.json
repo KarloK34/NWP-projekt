@@ -212,7 +212,9 @@
       "githubUrl": "GitHub URL",
       "huggingFaceUrl": "Hugging Face URL",
       "apiDocumentation": "API documentation",
-      "enrich": "Enrich from external APIs"
+      "enrich": "Enrich from external APIs",
+      "generateAiDescription": "Generate AI description",
+      "enrichSuccess": "AI description generated successfully"
     },
     "categories": {
       "title": "Categories management",

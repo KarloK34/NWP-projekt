@@ -157,8 +157,12 @@ const ToolForm = () => {
   const handleEnrich = async () => {
     try {
       setEnriching(true);
-      await api.post(`/tools/${id}/enrich`);
-      showToast(t('admin.toolForm.enrich'), 'success');
+      const res = await api.post(`/tools/${id}/enrich`);
+      const newDescription = res.data?.data?.tool?.description;
+      if (newDescription) {
+        setForm((prev) => ({ ...prev, description: newDescription }));
+      }
+      showToast(t('admin.toolForm.enrichSuccess'), 'success');
     } catch (err) {
       showToast(err.response?.data?.message || t('admin.error'), 'error');
     } finally {
@@ -333,7 +337,7 @@ const ToolForm = () => {
             </Button>
             {isEdit && (
               <Button type="button" variant="secondary" onClick={handleEnrich} disabled={enriching}>
-                {enriching ? t('common.loading') : t('admin.toolForm.enrich')}
+                {enriching ? t('common.loading') : t('admin.toolForm.generateAiDescription')}
               </Button>
             )}
           </div>

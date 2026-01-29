@@ -9,6 +9,7 @@ const User = require('../models/User');
 const Review = require('../models/Review');
 
 const { ValidationError } = require('../middleware/errorHandler');
+const aiDescriptionService = require('../services/aiDescriptionService');
 
 const isObjectId = (v) => mongoose.Types.ObjectId.isValid(v);
 
@@ -448,7 +449,7 @@ const getToolsStats = async (req, res, next) => {
 
 /**
  * POST /api/tools/:id/enrich (admin)
- * Obogaćivanje alata s podacima iz vanjskih API-ja. Minimalna implementacija – Hugging Face integracija opcionalna.
+ * Generira AI opis alata pomoću Groq API-ja i sprema u bazu.
  */
 const enrichTool = async (req, res, next) => {
   try {
@@ -462,11 +463,27 @@ const enrichTool = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Alat nije pronađen.' });
     }
 
-    // Placeholder: Hugging Face / vanjski API integracija može se dodati kasnije
+    const generatedDescription = await aiDescriptionService.generateToolDescription(
+      tool.name,
+      tool.website || ''
+    );
+
+    // Ograniči na 2000 znakova (limit u Tool modelu)
+    const description = generatedDescription.slice(0, 2000);
+
+    tool.description = description;
+    await tool.save();
+
+    const updated = await Tool.findById(id)
+      .populate('category', 'name')
+      .populate('tags', 'name')
+      .populate('models', 'name')
+      .lean();
+
     res.status(200).json({
       success: true,
-      message: 'Obogaćivanje trenutno nije implementirano. Možete ručno ažurirati podatke alata.',
-      data: { tool: await Tool.findById(id).populate('category', 'name').populate('tags', 'name').populate('models', 'name').lean() },
+      message: 'AI opis uspješno generiran i spremljen.',
+      data: { tool: updated },
     });
   } catch (error) {
     next(error);
