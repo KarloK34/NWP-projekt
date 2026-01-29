@@ -16,14 +16,14 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
         try {
           const catResponse = await api.get('/categories');
           if (catResponse.data.success) {
-            setCategories(catResponse.data.data || []);
+            setCategories(catResponse.data.data?.items || catResponse.data.data || []);
           }
         } catch (_) {}
 
         try {
           const tagsResponse = await api.get('/tags');
           if (tagsResponse.data.success) {
-            setTags(tagsResponse.data.data || []);
+            setTags(tagsResponse.data.data?.items || tagsResponse.data.data || []);
           }
         } catch (_) {}
       } catch (err) {
@@ -36,10 +36,15 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
     fetchData();
   }, []);
 
-  const handleCategoryChange = (categoryId) => {
+  const handleCategoryToggle = (categoryId) => {
+    const currentCategories = filters.categories || [];
+    const newCategories = currentCategories.includes(categoryId)
+      ? currentCategories.filter((id) => id !== categoryId)
+      : [...currentCategories, categoryId];
+
     onFiltersChange({
       ...filters,
-      category: filters.category === categoryId ? null : categoryId,
+      categories: newCategories.length > 0 ? newCategories : null,
       page: 1,
     });
   };
@@ -73,22 +78,13 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
     });
   };
 
-  const handleSortChange = (sort) => {
-    const [sortField, order] = sort.split('-');
-    onFiltersChange({
-      ...filters,
-      sort: sortField,
-      order: order || 'desc',
-    });
-  };
-
   const clearFilters = () => {
     onFiltersChange({
       page: 1,
       limit: 12,
       sort: 'rating',
       order: 'desc',
-      category: null,
+      categories: null,
       tags: null,
       pricing: null,
       minRating: null,
@@ -122,23 +118,29 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
         </Button>
       </div>
 
-      <div className="mb-6">
-        <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-          {t('filters.sort')}
-        </label>
-        <select
-          value={`${filters.sort || 'rating'}-${filters.order || 'desc'}`}
-          onChange={(e) => handleSortChange(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-        >
-          <option value="rating-desc">{t('filters.sortRatingDesc')}</option>
-          <option value="rating-asc">{t('filters.sortRatingAsc')}</option>
-          <option value="name-asc">{t('filters.sortNameAsc')}</option>
-          <option value="name-desc">{t('filters.sortNameDesc')}</option>
-          <option value="newest-desc">{t('filters.sortNewest')}</option>
-          <option value="oldest-asc">{t('filters.sortOldest')}</option>
-        </select>
-      </div>
+      {categories.length > 0 && (
+        <div className="mb-6">
+          <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+            {t('filters.categories')}
+          </label>
+          <div className="max-h-[100px] flex flex-col gap-2 overflow-y-auto">
+            {categories.map((category) => (
+              <label
+                key={category._id}
+                className="flex cursor-pointer items-center gap-2 text-sm dark:text-slate-300"
+              >
+                <input
+                  type="checkbox"
+                  checked={(filters.categories || []).includes(category._id)}
+                  onChange={() => handleCategoryToggle(category._id)}
+                  className="cursor-pointer"
+                />
+                <span>{category.name}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mb-6">
         <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -183,40 +185,16 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
         </select>
       </div>
 
-      {categories.length > 0 && (
-        <div className="mb-6">
-          <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-            {t('filters.categories')}
-          </label>
-          <div className="max-h-[200px] flex flex-col gap-2 overflow-y-auto">
-            {categories.map((category) => (
-              <label
-                key={category._id}
-                className="flex cursor-pointer items-center gap-2 text-sm dark:text-slate-300"
-              >
-                <input
-                  type="checkbox"
-                  checked={filters.category === category._id}
-                  onChange={() => handleCategoryChange(category._id)}
-                  className="cursor-pointer"
-                />
-                <span>{category.name}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
-
       {tags.length > 0 && (
         <div>
           <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
             {t('filters.tags')}
           </label>
-          <div className="max-h-[200px] flex flex-col gap-2 overflow-y-auto">
-            {tags.slice(0, 10).map((tag) => (
+          <div className="max-h-[100px] flex flex-col gap-2 overflow-y-auto">
+            {tags.map((tag) => (
               <label
                 key={tag._id}
-                className="flex cursor-pointer items-center gap-2 text-sm dark:text-slate-300"
+                className="flex shrink-0 cursor-pointer items-center gap-2 text-sm dark:text-slate-300"
               >
                 <input
                   type="checkbox"
@@ -227,11 +205,6 @@ const FilterPanel = ({ filters, onFiltersChange }) => {
                 <span>{tag.name}</span>
               </label>
             ))}
-            {tags.length > 10 && (
-              <p className="mt-2 text-xs italic text-slate-500 dark:text-slate-400">
-                {t('filters.moreTags', { count: tags.length - 10 })}
-              </p>
-            )}
           </div>
         </div>
       )}

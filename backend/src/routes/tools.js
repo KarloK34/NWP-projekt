@@ -7,6 +7,7 @@ const {
   updateTool,
   deleteTool,
   getToolsStats,
+  enrichTool,
 } = require('../controllers/toolsController');
 const { authenticate, authorizeAdmin } = require('../middleware/auth');
 const apiIntegrationController = require('../controllers/apiIntegrationController');
@@ -48,10 +49,31 @@ const toolValidation = [
     .optional()
     .isArray()
     .withMessage('models mora biti array'),
-  body('isPublished')
+  body('logo')
+    .optional({ nullable: true })
+    .isString()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('logo predugačak'),
+  body('metadata')
     .optional()
-    .isBoolean()
-    .withMessage('isPublished mora biti boolean'),
+    .isObject()
+    .withMessage('metadata mora biti objekt'),
+  body('metadata.githubUrl')
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ max: 500 }),
+  body('metadata.huggingFaceUrl')
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ max: 500 }),
+  body('metadata.apiDocumentation')
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ max: 500 }),
 ];
 
 // Public

@@ -28,7 +28,9 @@ const useTools = (filters = {}) => {
       if (filters.search && filters.search.trim()) {
         params.append('search', filters.search.trim());
       }
-      if (filters.category) params.append('category', filters.category);
+      if (filters.categories && filters.categories.length > 0) {
+        params.append('categories', filters.categories.join(','));
+      }
       if (filters.pricing) params.append('pricing', filters.pricing);
       if (filters.minRating !== undefined && filters.minRating !== null) {
         params.append('minRating', filters.minRating);
@@ -77,7 +79,7 @@ const useTools = (filters = {}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     filters.search,
-    filters.category,
+    filters.categories?.join(','),
     filters.pricing,
     filters.minRating,
     filters.tags?.join(','),

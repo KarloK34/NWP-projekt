@@ -18,4 +18,17 @@ router.post(
   categoriesController.createCategory
 );
 
+router.put(
+  '/:id',
+  authenticate,
+  authorizeAdmin,
+  [
+    body('name').optional().isString().trim().isLength({ min: 2, max: 80 }).withMessage('Name mora imati 2-80 znakova'),
+    body('description').optional().isString().isLength({ max: 500 }).withMessage('Opis max 500 znakova'),
+  ],
+  categoriesController.updateCategory
+);
+
+router.delete('/:id', authenticate, authorizeAdmin, categoriesController.deleteCategory);
+
 module.exports = router;

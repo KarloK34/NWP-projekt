@@ -33,8 +33,10 @@ export function ToastProvider({ children }) {
   toast.warning = (message) => addToast(message, 'warning', DEFAULT_DURATION);
   toast.dismiss = removeToast;
 
+  const showToast = useCallback((message, type = 'info') => addToast(message, type, DEFAULT_DURATION), [addToast]);
+
   return (
-    <ToastContext.Provider value={{ toast, addToast, removeToast }}>
+    <ToastContext.Provider value={{ toast, addToast, removeToast, showToast }}>
       {children}
       <div
         className="pointer-events-none fixed bottom-4 right-4 z-[100] flex max-w-sm flex-col gap-2 sm:bottom-6 sm:right-6"
@@ -62,6 +64,7 @@ export function useToast() {
       toast: (msg, type) => console.info('[Toast]', type, msg),
       addToast: () => {},
       removeToast: () => {},
+      showToast: () => {},
     };
   }
   return ctx;

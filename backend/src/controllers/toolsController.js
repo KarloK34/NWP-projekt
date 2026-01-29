@@ -5,8 +5,11 @@ const Tool = require('../models/Tool');
 const Category = require('../models/Category');
 const Tag = require('../models/Tag');
 const AIModel = require('../models/AIModel');
+const User = require('../models/User');
+const Review = require('../models/Review');
 
 const { ValidationError } = require('../middleware/errorHandler');
+const aiDescriptionService = require('../services/aiDescriptionService');
 
 const isObjectId = (v) => mongoose.Types.ObjectId.isValid(v);
 
@@ -38,19 +41,20 @@ const getSortObject = (sort, order) => {
       return { createdAt: 1 };
     case 'rating':
     default:
-      return { rating: -1, reviewCount: -1, createdAt: -1 };
+      return { rating: dir, reviewCount: dir, createdAt: dir };
   }
 };
 
 /**
  * GET /api/tools
  * Query params:
- * category, tags, pricing, minRating, search, page, limit, sort, order, models (bonus)
+ * category, categories (comma-separated), tags, pricing, minRating, search, page, limit, sort, order, models (bonus)
  */
 const getTools = async (req, res, next) => {
   try {
     const {
       category,
+      categories,
       tags,
       pricing,
       minRating,
@@ -66,15 +70,20 @@ const getTools = async (req, res, next) => {
 
     const filter = {};
 
-    // category može biti ObjectId ili slug
-    if (category) {
-      if (isObjectId(category)) {
-        filter.category = category;
-      } else {
-        const cat = await Category.findOne({ slug: category }).select('_id');
-        // ako nema takve kategorije -> nema rezultata
-        filter.category = cat ? cat._id : null;
+    // categories: više kategorija (comma-separated), ili category: jedna (backward compat)
+    const categoryList = parseCommaList(categories || category);
+    if (categoryList.length > 0) {
+      const ids = categoryList.filter(isObjectId);
+      const slugs = categoryList.filter((c) => !isObjectId(c));
+
+      let categoryIds = [...ids];
+
+      if (slugs.length > 0) {
+        const found = await Category.find({ slug: { $in: slugs } }).select('_id');
+        categoryIds = categoryIds.concat(found.map((c) => c._id));
       }
+
+      filter.category = categoryIds.length === 0 ? { $in: [] } : { $in: categoryIds };
     }
 
     // pricing
@@ -125,16 +134,23 @@ const getTools = async (req, res, next) => {
     const hasSearch = search && String(search).trim().length > 0;
 
     const sortObj = getSortObject(sort, order);
+    const sortByName = sort && String(sort).toLowerCase() === 'name';
 
     const findQuery = hasSearch
       ? { ...filter, name: { $regex: String(search).trim(), $options: 'i' } }
       : filter;
 
+    let query = Tool.find(findQuery)
+      .populate('category', 'name slug')
+      .populate('tags', 'name')
+      .populate('models', 'name');
+
+    if (sortByName) {
+      query = query.collation({ locale: 'en', strength: 2 });
+    }
+
     const [items, total] = await Promise.all([
-      Tool.find(findQuery)
-        .populate('category', 'name slug')
-        .populate('tags', 'name')
-        .populate('models', 'name')
+      query
         .sort(sort ? sortObj : (hasSearch ? { createdAt: -1 } : { rating: -1, reviewCount: -1, createdAt: -1 }))
         .skip(skip)
         .limit(limit)
@@ -214,14 +230,15 @@ const createTool = async (req, res, next) => {
       name,
       description,
       website,
+      logo,
       pricing,
       category,
       tags = [],
       models = [],
-      isPublished = true,
+      metadata,
     } = req.body;
 
-    const tool = await Tool.create({
+    const toolData = {
       name,
       description,
       website,
@@ -229,9 +246,17 @@ const createTool = async (req, res, next) => {
       category,
       tags,
       models,
-      isPublished,
       createdBy: req.user?.id || req.user?._id,
-    });
+    };
+    if (logo !== undefined) toolData.logo = logo || '';
+    if (metadata && typeof metadata === 'object') {
+      toolData.metadata = {};
+      if (metadata.githubUrl) toolData.metadata.githubUrl = metadata.githubUrl;
+      if (metadata.huggingFaceUrl) toolData.metadata.huggingFaceUrl = metadata.huggingFaceUrl;
+      if (metadata.apiDocumentation) toolData.metadata.apiDocumentation = metadata.apiDocumentation;
+    }
+
+    const tool = await Tool.create(toolData);
 
     const created = await Tool.findById(tool._id)
       .populate('category', 'name slug')
@@ -280,11 +305,20 @@ const updateTool = async (req, res, next) => {
       category: req.body.category,
       tags: req.body.tags,
       models: req.body.models,
-      isPublished: req.body.isPublished,
+      logo: req.body.logo,
+      metadata: req.body.metadata,
     };
 
     // partial update - makni undefined
     Object.keys(update).forEach((k) => update[k] === undefined && delete update[k]);
+    if (update.metadata && typeof update.metadata === 'object') {
+      const m = update.metadata;
+      update.metadata = {
+        githubUrl: m.githubUrl || '',
+        huggingFaceUrl: m.huggingFaceUrl || '',
+        apiDocumentation: m.apiDocumentation || '',
+      };
+    }
 
     const tool = await Tool.findByIdAndUpdate(id, update, { new: true })
       .populate('category', 'name slug')
@@ -348,7 +382,6 @@ const deleteTool = async (req, res, next) => {
 const getToolsStats = async (req, res, next) => {
   try {
     const [overview] = await Tool.aggregate([
-      { $match: { isPublished: true } },
       {
         $group: {
           _id: null,
@@ -368,7 +401,6 @@ const getToolsStats = async (req, res, next) => {
     ]);
 
     const topCategories = await Tool.aggregate([
-      { $match: { isPublished: true } },
       { $group: { _id: '$category', toolsCount: { $sum: 1 } } },
       { $sort: { toolsCount: -1 } },
       { $limit: 10 },
@@ -392,13 +424,66 @@ const getToolsStats = async (req, res, next) => {
       },
     ]);
 
+    const [totalUsers, totalReviewCount] = await Promise.all([
+      User.countDocuments(),
+      Review.countDocuments(),
+    ]);
+
+    const overviewData = overview || { totalTools: 0, avgRating: 0, totalReviews: 0 };
     res.status(200).json({
       success: true,
       message: 'Statistike uspješno dohvaćene',
       data: {
-        overview: overview || { totalTools: 0, avgRating: 0, totalReviews: 0 },
+        overview: {
+          ...overviewData,
+          totalUsers,
+          totalReviews: totalReviewCount,
+        },
         topCategories,
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * POST /api/tools/:id/enrich (admin)
+ * Generira AI opis alata pomoću Groq API-ja i sprema u bazu.
+ */
+const enrichTool = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!isObjectId(id)) {
+      return res.status(400).json({ success: false, message: 'Neispravan ID alata.' });
+    }
+
+    const tool = await Tool.findById(id);
+    if (!tool) {
+      return res.status(404).json({ success: false, message: 'Alat nije pronađen.' });
+    }
+
+    const generatedDescription = await aiDescriptionService.generateToolDescription(
+      tool.name,
+      tool.website || ''
+    );
+
+    // Ograniči na 2000 znakova (limit u Tool modelu)
+    const description = generatedDescription.slice(0, 2000);
+
+    tool.description = description;
+    await tool.save();
+
+    const updated = await Tool.findById(id)
+      .populate('category', 'name')
+      .populate('tags', 'name')
+      .populate('models', 'name')
+      .lean();
+
+    res.status(200).json({
+      success: true,
+      message: 'AI opis uspješno generiran i spremljen.',
+      data: { tool: updated },
     });
   } catch (error) {
     next(error);
@@ -412,4 +497,5 @@ module.exports = {
   updateTool,
   deleteTool,
   getToolsStats,
+  enrichTool,
 };

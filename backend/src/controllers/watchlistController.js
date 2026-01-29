@@ -7,7 +7,13 @@ const isObjectId = (v) => mongoose.Types.ObjectId.isValid(v);
 const getWatchlist = async (req, res, next) => {
   try {
     const wl = await Watchlist.findOne({ user: req.user.id })
-      .populate('tools')
+      .populate({
+        path: 'tools',
+        populate: [
+          { path: 'category', select: 'name slug' },
+          { path: 'tags', select: 'name' },
+        ],
+      })
       .lean();
 
     return res.status(200).json({
@@ -37,7 +43,15 @@ const addToWatchlist = async (req, res, next) => {
       { user: req.user.id },
       { $addToSet: { tools: toolId } },
       { new: true, upsert: true }
-    ).populate('tools');
+    )
+      .populate({
+        path: 'tools',
+        populate: [
+          { path: 'category', select: 'name slug' },
+          { path: 'tags', select: 'name' },
+        ],
+      })
+      .lean();
 
     return res.status(200).json({
       success: true,
@@ -61,7 +75,15 @@ const removeFromWatchlist = async (req, res, next) => {
       { user: req.user.id },
       { $pull: { tools: toolId } },
       { new: true }
-    ).populate('tools');
+    )
+      .populate({
+        path: 'tools',
+        populate: [
+          { path: 'category', select: 'name slug' },
+          { path: 'tags', select: 'name' },
+        ],
+      })
+      .lean();
 
     return res.status(200).json({
       success: true,

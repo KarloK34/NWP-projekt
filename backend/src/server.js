@@ -35,6 +35,7 @@ app.use('/api/watchlist', require('./routes/watchlist'));
 app.use('/api/categories', require('./routes/categories'));
 app.use('/api/tags', require('./routes/tags'));
 app.use('/api/models', require('./routes/models'));
+app.use('/api/users', require('./routes/users'));
 
 // Error handling middleware (must be after all routes)
 const { errorHandler } = require('./middleware/errorHandler');
