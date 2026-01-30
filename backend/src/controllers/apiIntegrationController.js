@@ -5,7 +5,6 @@ const Tool = require('../models/Tool');
 const Category = require('../models/Category');
 
 const githubCatalogService = require('../services/githubCatalogService');
-const huggingFaceService = require('../services/huggingFaceService');
 
 
 function normKey(v) {
@@ -221,57 +220,6 @@ const importFromGithub = async (req, res, next) => {
   }
 };
 
-// POST /api/tools/:id/enrich (admin)
-const enrichTool = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-
-    if (!isObjectId(id)) {
-      return res.status(400).json({ success: false, message: 'Neispravan ID alata.' });
-    }
-
-    const tool = await Tool.findById(id).populate('models');
-    if (!tool) {
-      return res.status(404).json({ success: false, message: 'Alat nije pronađen.' });
-    }
-
-    const model = (tool.models || []).find((m) => m.huggingFaceModelId && m.huggingFaceModelId.trim());
-    if (!model) {
-      return res.status(400).json({
-        success: false,
-        message: 'Alat nema povezani AIModel s huggingFaceModelId.',
-      });
-    }
-
-    const hfId = model.huggingFaceModelId.trim();
-
-    const hfData = await huggingFaceService.getModelDetails(hfId);
-
-    tool.metadata = tool.metadata || {};
-    tool.metadata.huggingFaceUrl = `https://huggingface.co/${hfId}`;
-
-    // OVO radi samo ako dodaš metadata.huggingFaceData u Tool.js schema
-    tool.metadata.huggingFaceData = {
-      ...hfData,
-      updatedAt: new Date(),
-    };
-
-    await tool.save();
-
-    return res.status(200).json({
-      success: true,
-      message: 'Alat obogaćen Hugging Face podacima',
-      data: {
-        toolId: tool._id,
-        huggingFaceModelId: hfId,
-        huggingFaceData: tool.metadata.huggingFaceData,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 // GET /api/tools/:id/external-data (public)
 const getExternalData = async (req, res, next) => {
   try {
@@ -300,7 +248,6 @@ const getExternalData = async (req, res, next) => {
           huggingFaceUrl: tool.metadata?.huggingFaceUrl || null,
           apiDocumentation: tool.metadata?.apiDocumentation || null,
         },
-        huggingFace: tool.metadata?.huggingFaceData || null,
         models: tool.models || [],
       },
     });
@@ -312,7 +259,6 @@ const getExternalData = async (req, res, next) => {
 
 module.exports = {
   importFromGithub,
-  enrichTool,
   getExternalData,
 };
 

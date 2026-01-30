@@ -78,15 +78,6 @@ const toolSchema = new mongoose.Schema(
         type: String,
         trim: true,
       },
-      huggingFaceData: {
-        modelId: { type: String, trim: true },
-        downloads: { type: Number, default: 0 },
-        likes: { type: Number, default: 0 },
-        taskType: { type: String, trim: true },
-        lastModified: { type: String, trim: true },
-        tags: [{ type: String, trim: true }],
-        updatedAt: { type: Date },
-      },
       // Additional metadata can be added here
     },
     createdBy: {

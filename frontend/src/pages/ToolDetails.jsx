@@ -213,48 +213,63 @@ const ToolDetails = () => {
             </section>
           )}
 
-          {tool.metadata &&
+          {(tool.metadata &&
             (tool.metadata.githubUrl ||
               tool.metadata.huggingFaceUrl ||
-              tool.metadata.apiDocumentation) && (
-              <section className="mb-8 border-b border-slate-200 pb-8 dark:border-slate-700">
-                <h2 className="mb-4 text-xl font-bold text-slate-800 dark:text-slate-100">
-                  {t('tool.additionalResources')}
-                </h2>
-                <div className="flex flex-wrap gap-4">
-                  {tool.metadata.githubUrl && (
+              tool.metadata.apiDocumentation)) ||
+          (tool.models &&
+            tool.models.some((m) => m.huggingFaceModelId && m.huggingFaceModelId.trim())) ? (
+            <section className="mb-8 border-b border-slate-200 pb-8 dark:border-slate-700">
+              <h2 className="mb-4 text-xl font-bold text-slate-800 dark:text-slate-100">
+                {t('tool.additionalResources')}
+              </h2>
+              <div className="flex flex-wrap gap-4">
+                {tool.metadata?.githubUrl && (
+                  <a
+                    href={tool.metadata.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 font-medium text-slate-800 no-underline transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
+                  >
+                    📦 GitHub
+                  </a>
+                )}
+                {tool.metadata?.huggingFaceUrl && (
+                  <a
+                    href={tool.metadata.huggingFaceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 font-medium text-slate-800 no-underline transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
+                  >
+                    🤗 Hugging Face
+                  </a>
+                )}
+                {tool.metadata?.apiDocumentation && (
+                  <a
+                    href={tool.metadata.apiDocumentation}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 font-medium text-slate-800 no-underline transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
+                  >
+                    📚 API
+                  </a>
+                )}
+                {tool.models
+                  ?.filter((m) => m.huggingFaceModelId?.trim())
+                  .map((model) => (
                     <a
-                      href={tool.metadata.githubUrl}
+                      key={model._id || model.huggingFaceModelId}
+                      href={`https://huggingface.co/${model.huggingFaceModelId.trim()}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 font-medium text-slate-800 no-underline transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
                     >
-                      📦 GitHub
+                      🤗 {model.name || model.huggingFaceModelId}
                     </a>
-                  )}
-                  {tool.metadata.huggingFaceUrl && (
-                    <a
-                      href={tool.metadata.huggingFaceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 font-medium text-slate-800 no-underline transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
-                    >
-                      🤗 Hugging Face
-                    </a>
-                  )}
-                  {tool.metadata.apiDocumentation && (
-                    <a
-                      href={tool.metadata.apiDocumentation}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-3 font-medium text-slate-800 no-underline transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
-                    >
-                      📚 API
-                    </a>
-                  )}
-                </div>
-              </section>
-            )}
+                  ))}
+              </div>
+            </section>
+          ) : null}
 
           <section className="pt-8">
             <ReviewsList toolId={id} onReviewChange={refetchTool} />

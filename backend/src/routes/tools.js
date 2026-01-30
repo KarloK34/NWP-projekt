@@ -91,7 +91,7 @@ router.post('/import-from-github', authenticate, authorizeAdmin, [
 router.get('/stats', authenticate, authorizeAdmin, getToolsStats);
 
 // Tool-specific integration routes (mora prije /:id)
-router.post('/:id/enrich', authenticate, authorizeAdmin, apiIntegrationController.enrichTool);
+router.post('/:id/enrich', authenticate, authorizeAdmin, enrichTool);
 router.get('/:id/external-data', apiIntegrationController.getExternalData);
 
 // CRUD

@@ -191,7 +191,7 @@ const getToolById = async (req, res, next) => {
     const tool = await Tool.findById(id)
       .populate('category', 'name slug')
       .populate('tags', 'name')
-      .populate('models', 'name')
+      .populate('models', 'name huggingFaceModelId')
       .populate('createdBy', 'username email')
       .lean();
 
